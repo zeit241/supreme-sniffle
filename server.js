@@ -15,16 +15,7 @@ app.use('/api/', require('./server/routes/routes'))
 app.listen(3000, ()=>{
   console.log('Сервер запущен')
 })
-// async function addNewLink(){
-//   const Link = await new link({
-//     link: 'http://localhost:3000',
-//     name: 'Name #1',
-//     description: 'Some description  Some description Some description Some description',
-//     image: 'http://localhost:3000-',
-//     redirect: 'http://localhost:3000',
-//   }).save()
-// }
-// addNewLink()
+
 
 bot.onText(/\/start/, (msg) => {
   isAuth(msg)
@@ -52,3 +43,15 @@ bot.onText(/Подать заявку/,async (msg) => {
 
   
 })
+// NTBA_FIX_319 = 1
+// db = mongodb+srv://jvproduction:jvprod12ws1@cluster0.w4e88.mongodb.net/DB?retryWrites=true&w=majority
+// Bot = 2049069473:AAHir3pfuODtgD7thDmk9l9At-4bWDQb9Ag
+// Bot1 = 1
+// NotifyGroup = -1001518672052
+// NotifyGroup2 = -1001743920551
+// AdminChat = -1001667358664
+// Admin = @VinciCash_S
+// Chat = https://t.me/sniffer_chat
+// Channel = https://t.me/ssniffer 
+
+

