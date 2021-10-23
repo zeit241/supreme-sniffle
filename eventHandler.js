@@ -157,14 +157,6 @@ bot.onText(/📊 О боте/, async (msg) => {
     })
     if (user.isAccepted == 'true') {
         bot.sendMessage(msg.chat.id, `📊 Статистика\n\nРегистраций в боте: <b>${(await data.find()).length}</b>\nПодписчиков в канале: <b>${await bot.getChatMemberCount('@ssniffer')}</b>\nВзломанных аккаунтов: <b>${(await account.find()).length}</b>\n\nМы работаем с 2021 года.`, {
-            reply_markup: {
-                inline_keyboard: [
-                    [{
-                        text: 'x',
-                        callback_data: 'm'
-                    }, undefined]
-                ]
-            },
             parse_mode: 'HTML'
         })
     }
