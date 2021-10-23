@@ -1,44 +1,97 @@
 const tools = require('../server/tools')
-const bot  = require('../createBot')
+const bot = require('../createBot')
 const user = require('../database/models/userData')
-
+const {Menu} = require('../objects')
 async function isAuth(msg) {
     const condidate = await user.findOne({
         tg_id: msg.chat.id
     })
     if (condidate) {
         if (condidate.isAccepted == 'true') {
-            tools.CreateNewMessageWithKeyboard(msg.chat.id, 'Добро пожаловать!', [
-                ['👤 Мой профиль', '🔗 Мои ссылки'],
-                ['👥 Мои аккаунты', '👑 VIP Статус'],
-                ['❓ Информация', '👥 Наш чат'],
-                ['⚡️ Новости', '📊 О боте']
-            ])
+            bot.sendMessage(msg.chat.id, 'Добро пожаловать!', {
+                reply_markup: {
+                    keyboard: Menu
+                }
+            })
         } else if (condidate.isAccepted == 'checking') {
             if (condidate.expirience == '-') {
-                tools.CreateNewMessageWithKeyboard(msg.chat.id, 'Перед тем как ты сможешь получить доступ к боту, ответь пожалуйста не несколько вопросов\n(Ответы ни на что не влияют, они нужны для статистики)', [
-                    ['Написать админу']
-                ])
+                bot.sendMessage(msg.chat.id, 'Перед тем как ты сможешь получить доступ к боту, ответь пожалуйста не несколько вопросов\n(Ответы ни на что не влияют, они нужны для статистики)', {
+                    reply_markup: {
+                        keyboard: [
+                            ['Написать админу']
+                        ]
+                    }
+                })
+                bot.sendMessage(msg.chat.id, '1. Был ли у тебя опыт в фишинге?', {
+                    reply_markup: {
+                      inline_keyboard: [
+                        [{
+                          text: "Да",
+                          callback_data: "experiance_true"
+                        }, {
+                          text: "Нет",
+                          callback_data: "experiance_false"
+                        }],
+                      ]
+                    }
+                })
             }
             if (condidate.from == '-') {
-                return true
+                bot.sendMessage(msg.chat.id, 'Перед тем как ты сможешь получить доступ к боту, ответь пожалуйста не несколько вопросов\n(Ответы ни на что не влияют, они нужны для статистики)', {
+                    reply_markup: {
+                        keyboard: [
+                            ['Написать админу']
+                        ]
+                    }
+                })
+                bot.sendMessage(msg.chat.id, '2. Откуда узнали о нашем проекте', {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{
+                                text: "Реклама",
+                                callback_data: "from_ad"
+                            }, {
+                                text: "От друзей",
+                                callback_data: "from_friend"
+                            }],
+                            [{
+                                text: "Другое",
+                                callback_data: "from_other"
+                            }]
+                        ]
+                    }
+                })
             }
             if (condidate.from != '' && condidate.expirience != '') {
-                tools.CreateNewMessageWithKeyboard(msg.chat.id, 'Ваша заявка еще рассматривется, мы постараемся обработать вашу заявку в ближайшее время.', [
-                    ['Написать админу']
-                ])
+                bot.sendMessage(msg.chat.id, 'Ваша заявка еще рассматривется, мы постараемся обработать вашу заявку в ближайшее время.', {
+                    reply_markup: {
+                        keyboard: [
+                            ['Написать админу']
+                        ]
+                    }
+                })
             }
         } else if (condidate.isAccepted == 'false') {
-            tools.CreateNewMessageWithKeyboard(msg.chat.id, 'К сожалению ваша заявка не прошла отбор, вы можете попробовать еще раз позже.', [
-                ['Написать админу']
-            ])
+            bot.sendMessage(msg.chat.id, 'К сожалению ваша заявка не прошла отбор, вы можете попробовать еще раз позже.', {
+                reply_markup: {
+                    keyboard: [
+                        ['Написать админу']
+                    ]
+                }
+            })
         }
     } else {
         await bot.sendMessage(msg.chat.id, '👮‍♀')
-        tools.CreateNewMessageWithKeyboard(msg.chat.id, '<b>Добро пожаловать!</b>\nЧтобы получить доступ, подайте заявку👇🏻', [
-            ["Подать заявку"],
-            ['Написать админу']
-        ])
+        bot.sendMessage(msg.chat.id, '<b>Добро пожаловать!</b>\nЧтобы получить доступ, подайте заявку👇🏻', {
+            reply_markup: {
+                keyboard: [
+                    ["Подать заявку"],
+                    ['Написать админу']
+                ],
+                resize_keyboard: true
+            },
+            parse_mode: 'HTML'
+        })
         let ref_id = 0
         if (msg.text.split(' ')[1]) {
             let condidate = await user.findOne({
@@ -48,8 +101,8 @@ async function isAuth(msg) {
                 ref_id = msg.text.split(' ')[1]
             }
         }
-        const NewUser = new user({
-            login: msg.chat.username,
+        new user({
+            login: msg.chat.username || 'none',
             name: msg.chat.first_name,
             expirience: '-',
             from: '-',

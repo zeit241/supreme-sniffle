@@ -7,7 +7,7 @@
     "node": ">=12"
   },
   "scripts": {
-    "test": "node server.js"
+    "start": "node server.js"
   },
   "author": "",
   "license": "ISC",

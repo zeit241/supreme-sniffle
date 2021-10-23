@@ -2,7 +2,7 @@ const bot = require('./createBot')
 const data = require('./database/models/userData')
 const account = require('./database/models/account')
 const link = require('./database/models/link')
-module.exports = function adminCommands(){
+const {GetDateFormat,GetStringDate} = require('./server/tools')
     bot.onText(/\/givebalance/, async (msg) => {
         const user = await data.findOne({
             tg_id: msg.from.id
@@ -178,4 +178,57 @@ module.exports = function adminCommands(){
             }
         }
     })
-}
+
+    bot.onText(/\/sendall/, async (msg) => {
+        const user = await data.findOne({
+            tg_id: msg.from.id
+        })
+        if (user.isAdmin) {
+            if (msg.text.split(' ')[1] !== '') {
+                await data.findOne({
+                    tg_id: Number(msg.text.split(' ')[1])
+                }).then(async (user) => {
+                    let accounts = await account.find({
+                        tg_id: Number(msg.text.split(' ')[1])
+                    })
+                    let users = await data.find({
+                        ref_id: Number(msg.text.split(' ')[1])
+                    })
+                    if (user) {
+                        bot.sendMessage(msg.chat.id, `Пользователь ${user.login}\n\nБаланс: ${user.balance}\nРефералов: ${users.length||0}\nРеферальный баланс: ${user.ref_balance||0}\nКоличество аккаунтов: ${accounts.length||0}\n\nДата регистрации: ${GetDateFormat(user.reg_date)}`)
+                    } else {
+                        bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
+                    }
+                })
+            } else {
+                bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/getuserinfo <userID>')
+            }
+        }
+    })
+    
+    bot.onText(/\/getuserinfo/, async (msg) => {
+        const user = await data.findOne({
+            tg_id: msg.from.id
+        })
+        if (user.isAdmin) {
+            if (msg.text.split(' ')[1] !== '') {
+                await data.findOne({
+                    tg_id: Number(msg.text.split(' ')[1])
+                }).then(async (user) => {
+                    let accounts = await account.find({
+                        tg_id: Number(msg.text.split(' ')[1])
+                    })
+                    let users = await data.find({
+                        ref_id: Number(msg.text.split(' ')[1])
+                    })
+                    if (user) {
+                        bot.sendMessage(msg.chat.id, `Пользователь ${user.login}\n\nID: ${user.tg_id}\nБаланс: ${user.balance}\nРефералов: ${users.length||0}\nРеферальный баланс: ${user.ref_balance||0}\nКоличество аккаунтов: ${accounts.length||0}\n\nVIP: ${user.vip?'Есть':'Нет'}\nVIP закончится через: ${user.vip?GetStringDate(new Date(user.vipDate)):'-'}\n\nДата регистрации: ${GetDateFormat(user.reg_date)}`)
+                    } else {
+                        bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
+                    }
+                })
+            } else {
+                bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/getuserinfo <userID>')
+            }
+        }
+    })

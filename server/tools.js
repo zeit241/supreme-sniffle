@@ -1,27 +1,15 @@
 const bot = require('../createBot')
-
+const {
+    names,
+    links,
+} = require('../objects')
 const tools = {
-    CreateNewMessageWithKeyboard (id, text, keyboard){
-        let options = {
-            reply_markup: {
-                keyboard: keyboard,
-                resize_keyboard: true,
-            },
-            parse_mode: 'HTML'
-        }
-        bot.sendMessage(id, text, options)
+    CreateReplayList(type){
+        let array = []
+        
+        return array
     },
-    CreateNewMessageWithInlineKeyboard (id, text, keyboard){
-        let options = {
-            reply_markup: {
-                inline_keyboard: keyboard,
-                resize_keyboard: true,
-            },
-            parse_mode: 'HTML'
-        }
-        bot.sendMessage(id, text, options)
-    },
-     GetStringDate(date){
+    GetStringDate(date){
        let result = (date - new Date())+1000
        let seconds = Math.floor((result/1000)%60);
        let minutes = Math.floor((result/1000/60)%60);
@@ -35,6 +23,10 @@ const tools = {
        }else{
             return `${days} дней ${hours} час(ов) ${minutes} минут ${seconds} секунд`
        }
+    },
+    GetDateFormat(date){
+        let x = new Date(date)
+        return `${x.getDay()}.${x.getMonth()}.${x.getFullYear()} / ${x.getHours()}:${x.getMinutes()}`
     }
 }
 

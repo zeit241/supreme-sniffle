@@ -66,6 +66,12 @@ const userSchema = new Schema({
     isAccepted:{
         type: String,
         default: 'checking'
+    },
+    transactions:{
+        type: Array
+    },
+    ref_balance:{
+        type: Number
     }
 },{
     versionKey: false
