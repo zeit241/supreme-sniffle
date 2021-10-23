@@ -152,7 +152,6 @@ bot.onText(/🔗 Мои ссылки/, async (msg) => {
     }
 })
 bot.onText(/📊 О боте/, async (msg) => {
-    ReplayList('List')
     const user = await data.findOne({
         tg_id: msg.chat.id
     })
@@ -279,5 +278,13 @@ bot.onText(/💸 Пополнение/, async (msg) => {
             },
             disable_web_page_preview: true
         })
+    }
+})
+bot.onText(/👨‍👩‍👧‍👦 Мои рефералы/, async (msg) => {
+    const user = await data.findOne({
+        tg_id: msg.chat.id
+    })
+    if (user.isAccepted == 'true') {
+        bot.sendMessage(msg.chat.id, 'Канал с новостями \n' + process.env.Channel)
     }
 })

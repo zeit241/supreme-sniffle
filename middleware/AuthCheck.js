@@ -10,8 +10,10 @@ async function isAuth(msg) {
         if (condidate.isAccepted == 'true') {
             bot.sendMessage(msg.chat.id, 'Добро пожаловать!', {
                 reply_markup: {
-                    keyboard: Menu
+                    keyboard: Menu,
+                    resize_keyboard:true
                 }
+
             })
         } else if (condidate.isAccepted == 'checking') {
             if (condidate.expirience == '-') {
@@ -19,7 +21,8 @@ async function isAuth(msg) {
                     reply_markup: {
                         keyboard: [
                             ['Написать админу']
-                        ]
+                        ],
+                        resize_keyboard: true
                     }
                 })
                 bot.sendMessage(msg.chat.id, '1. Был ли у тебя опыт в фишинге?', {
@@ -41,7 +44,8 @@ async function isAuth(msg) {
                     reply_markup: {
                         keyboard: [
                             ['Написать админу']
-                        ]
+                        ],
+                        resize_keyboard: true
                     }
                 })
                 bot.sendMessage(msg.chat.id, '2. Откуда узнали о нашем проекте', {
@@ -67,7 +71,8 @@ async function isAuth(msg) {
                     reply_markup: {
                         keyboard: [
                             ['Написать админу']
-                        ]
+                        ],
+                        resize_keyboard: true
                     }
                 })
             }
@@ -76,7 +81,8 @@ async function isAuth(msg) {
                 reply_markup: {
                     keyboard: [
                         ['Написать админу']
-                    ]
+                    ],
+                    resize_keyboard: true
                 }
             })
         }
