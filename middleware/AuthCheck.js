@@ -2,7 +2,7 @@ const tools = require('../server/tools')
 const bot = require('../createBot')
 const user = require('../database/models/userData')
 const {Menu} = require('../objects')
-async function isAuth(msg) {
+module.exports =  async function isAuth(msg) {
     const condidate = await user.findOne({
         tg_id: msg.chat.id
     })
@@ -13,7 +13,6 @@ async function isAuth(msg) {
                     keyboard: Menu,
                     resize_keyboard:true
                 }
-
             })
         } else if (condidate.isAccepted == 'checking') {
             if (condidate.expirience == '-') {
@@ -122,5 +121,3 @@ async function isAuth(msg) {
         }).save()
     }
 }
-
-module.exports = isAuth

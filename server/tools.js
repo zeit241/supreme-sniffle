@@ -1,12 +1,7 @@
-const bot = require('../createBot')
-const {
-    names,
-    links,
-} = require('../objects')
-const tools = {
+const {names,links} = require('../objects')
+module.exports = tools = {
     CreateReplayList(type){
         let array = []
-        
         return array
     },
     GetStringDate(date){
@@ -24,10 +19,14 @@ const tools = {
             return `${days} дней ${hours} час(ов) ${minutes} минут ${seconds} секунд`
        }
     },
+    GetDaysCount(date){
+        return Math.round((Date.parse(new Date()) - Date.parse(date))/86400000)
+    },
     GetDateFormat(date){
-        let x = new Date(date)
-        return `${x.getDay()}.${x.getMonth()}.${x.getFullYear()} / ${x.getHours()}:${x.getMinutes()}`
+        return `${new Date(date).getDay()}.${new Date(date).getMonth()}.${new Date(date).getFullYear()} / ${new Date(date).getHours()}:${new Date(date).getMinutes()}`
+    },
+    VipCheck(date){
+        return new Date(date) < new Date()
     }
 }
 
-module.exports = tools

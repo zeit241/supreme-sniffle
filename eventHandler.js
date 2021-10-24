@@ -1,12 +1,11 @@
 const bot = require('./createBot')
 const adminCommands = require('./adminCommands')
-const StringDate = require('./server/tools').GetStringDate
-const ReplayList = require('./server/tools').CreateReplayList
 const data = require('./database/models/userData')
 const account = require('./database/models/account')
 const link = require('./database/models/link')
 const isAuth = require('./middleware/AuthCheck')
-
+const {GetStringDate,GetDaysCount,VipCheck} = require('./server/tools')
+const {vip} = require('./objects')
 
 bot.onText(/\/start/, (msg) => {
     isAuth(msg)
@@ -35,15 +34,26 @@ bot.onText(/👤 Мой профиль/, async (msg) => {
         tg_id: msg.chat.id
     })
     if (user.isAccepted == 'true') {
-        let visit = 0
-        let authVist = 0
-        let accountsToday = 0
-        let accountsWeekend = 0
-        let accountsAllTime = 0
-        let admin = 'Пользователь'
+        let today = 0, week = 0, month = 0
         const accounts = await account.find({
             tg_id: msg.chat.id
         })
+        accounts.map(account =>{
+            let x = GetDaysCount(account.date)
+            if(x>=0&&x<=1){
+                today++
+                week++
+                month++
+            }
+            if(x>1 && x<=7){
+                week++
+                month++
+            }
+            if(x>7 && x<=30){
+                month++ 
+            }
+        })
+        let admin = 'Пользователь'
         if (user.vip) {
             admin = 'VIP Пользователь'
         }
@@ -56,7 +66,7 @@ bot.onText(/👤 Мой профиль/, async (msg) => {
                 authVist++
             }
         })
-        bot.sendMessage(msg.chat.id, `👤 Мой профиль\n\n🆔 ID: <code>${msg.chat.id}</code>\n🎗 Статус: ${admin}\n\n💸 Баланс: ${user.balance}₽\n\n☘️ Аккаунтов за сегодня: 0\n☘️ Аккаунтов за неделю: 0\n☘️ Аккаунтов за месяц: 0\n☘️ Аккаунтов за всё время: 0\n\n👀 Переходов за всё время: ${visit}\n🔐 Переходов на авторизацию за всё время: ${authVist}`, {
+        await bot.sendMessage(msg.chat.id, `👤 Мой профиль\n\n🆔 ID: <code>${msg.chat.id}</code>\n🎗 Статус: ${admin}\n\n💸 Баланс: ${user.balance}₽\n\n☘️ Аккаунтов за сегодня: ${today}\n☘️ Аккаунтов за неделю: ${week}\n☘️ Аккаунтов за месяц: ${month}\n☘️ Аккаунтов за всё время: ${accounts.length}\n\n👀 Переходов за всё время: ${accounts.length}\n🔐 Переходов на авторизацию за всё время: ${accounts.length}`, {
             parse_mode: 'HTML'
         })
     }
@@ -165,22 +175,10 @@ bot.onText(/👑 VIP Статус/, async (msg) => {
     const user = await data.findOne({
         tg_id: msg.chat.id
     })
+    console.log()
     if (user.isAccepted == 'true') {
         if (user.vip) {
-            let vipType = ''
-            if (user.vipType == '1') {
-                vipType = 'Рабочий'
-            }
-            if (user.vipType == '2') {
-                vipType = 'Любитель'
-            }
-            if (user.vipType == '3') {
-                vipType = 'Профи'
-            }
-            if (user.vipType == '4') {
-                vipType = 'Предприниматель'
-            }
-            bot.sendMessage(msg.chat.id, `У вас есть <b>VIP</b> статус [${vipType}].\nVIP закончится через ${StringDate(new Date(user.vipDate))}`, {
+            bot.sendMessage(msg.chat.id, `У вас есть <b>VIP</b> статус [${vip[Number(user.vipType)].name}].\nVIP закончится через ${GetStringDate(new Date(user.vipDate))}`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{
@@ -277,6 +275,34 @@ bot.onText(/👨‍👩‍👧‍👦 Мои рефералы/, async (msg) => {
         tg_id: msg.chat.id
     })
     if (user.isAccepted == 'true') {
-        bot.sendMessage(msg.chat.id, 'Канал с новостями \n' + process.env.Channel)
+
+    }
+})
+
+bot.on('message', async (msg) => {
+    const user = await data.findOne({
+        tg_id: msg.chat.id
+    })
+    if(user.vip){
+        if(VipCheck(user.vipDate)){
+            setTimeout(async () =>{
+                await data.updateOne({
+                    tg_id: msg.chat.id
+                }, {
+                    vip: false,
+                    vipType: '',
+                    vipDate: ''
+                }, {
+                    upsert: true
+                })
+                bot.sendMessage(msg.chat.id, 'Ваш VIP статус закончился, вы можете приобрести его по кнопке ниже',{
+                    reply_markup:{
+                        inline_keyboard: [
+                            [{text: 'Купить VIP', callback_data: 'show_vip'}]
+                        ]
+                    }
+                })
+            }, 200)
+        }
     }
 })

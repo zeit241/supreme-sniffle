@@ -36,7 +36,6 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
             }
         }
     })
-
     bot.onText(/\/unvip/, async (msg) => {
         const user = await data.findOne({
             tg_id: msg.from.id
@@ -72,7 +71,6 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
             }
         }
     })
-
     bot.onText(/\/clear/, async (msg) => {
         const user = await data.findOne({
             tg_id: msg.from.id
@@ -101,7 +99,6 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
             }
         }
     })
-
     bot.onText(/\/addnewlink/, async (msg) => {
         const user = await data.findOne({
             tg_id: msg.from.id
@@ -130,7 +127,6 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
             }
         }
     })
-
     bot.onText(/\/removelink/, async (msg) => {
         const user = await data.findOne({
             tg_id: msg.from.id
@@ -177,35 +173,7 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
                 bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/clear <userID>')
             }
         }
-    })
-
-    bot.onText(/\/sendall/, async (msg) => {
-        const user = await data.findOne({
-            tg_id: msg.from.id
-        })
-        if (user.isAdmin) {
-            if (msg.text.split(' ')[1] !== '') {
-                await data.findOne({
-                    tg_id: Number(msg.text.split(' ')[1])
-                }).then(async (user) => {
-                    let accounts = await account.find({
-                        tg_id: Number(msg.text.split(' ')[1])
-                    })
-                    let users = await data.find({
-                        ref_id: Number(msg.text.split(' ')[1])
-                    })
-                    if (user) {
-                        bot.sendMessage(msg.chat.id, `Пользователь ${user.login}\n\nБаланс: ${user.balance}\nРефералов: ${users.length||0}\nРеферальный баланс: ${user.ref_balance||0}\nКоличество аккаунтов: ${accounts.length||0}\n\nДата регистрации: ${GetDateFormat(user.reg_date)}`)
-                    } else {
-                        bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
-                    }
-                })
-            } else {
-                bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/getuserinfo <userID>')
-            }
-        }
-    })
-    
+    })  
     bot.onText(/\/getuserinfo/, async (msg) => {
         const user = await data.findOne({
             tg_id: msg.from.id
@@ -222,7 +190,7 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
                         ref_id: Number(msg.text.split(' ')[1])
                     })
                     if (user) {
-                        bot.sendMessage(msg.chat.id, `Пользователь ${user.login}\n\nID: ${user.tg_id}\nБаланс: ${user.balance}\nРефералов: ${users.length||0}\nРеферальный баланс: ${user.ref_balance||0}\nКоличество аккаунтов: ${accounts.length||0}\n\nVIP: ${user.vip?'Есть':'Нет'}\nVIP закончится через: ${user.vip?GetStringDate(new Date(user.vipDate)):'-'}\n\nДата регистрации: ${GetDateFormat(user.reg_date)}`)
+                        bot.sendMessage(msg.chat.id, `👨🏻‍💻 Пользователь ${user.login}\n\n🆔 ID: ${user.tg_id}\n💰 Баланс: ${user.balance}\n👨‍👩‍👧‍👧 Рефералов: ${users.length||0}\n👨‍👩‍👧‍👧 Реферальный баланс: ${user.ref_balance||0}\n👨‍👩‍👧‍👧 Количество аккаунтов: ${accounts.length||0}\n\n👑 VIP: ${user.vip?'✅':'🚫'}\n⏳ VIP закончится через: ${user.vip?GetStringDate(new Date(user.vipDate)):'🚫'}\n\n📆 Дата регистрации: ${GetDateFormat(user.reg_date)}`)
                     } else {
                         bot.sendMessage(msg.chat.id, 'Пользователь с таким ID не найден')
                     }
@@ -230,5 +198,28 @@ const {GetDateFormat,GetStringDate} = require('./server/tools')
             } else {
                 bot.sendMessage(msg.chat.id, 'Неверный синтаксис, пожалуйста введите команду в виде\n/getuserinfo <userID>')
             }
+        }
+    })
+    bot.onText(/\/sendall/, async (msg) => {
+        const user = await data.findOne({
+            tg_id: msg.from.id
+        })
+        if (user.isAdmin) {
+            let x = await bot.sendMessage(msg.chat.id, `Вы хотите отправить сообщение всем пользователям бота.\nДля этого в ответ на это сообщение отправте текст рассылки`)
+            bot.onReplyToMessage(x.chat.id, x.message_id, async function sendToAll(msg){
+                const users = await data.find()
+                users.reverse()
+                let c = 0, b = 0
+                users.map(async user => {
+                    if(msg.photo){           
+                        bot.sendPhoto(user.tg_id, msg.photo[msg.photo.length-1].file_id, {
+                            caption: msg.caption
+                        })
+                    }else{
+                        await bot.sendMessage(user.tg_id, msg.text).then((msg) => c++).catch(e=>{b++})
+                    }
+                })
+                await bot.sendMessage(x.chat.id, `Рассылка окончена`)
+            })
         }
     })
