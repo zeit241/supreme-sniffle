@@ -283,7 +283,7 @@ bot.on('message', async (msg) => {
     const user = await data.findOne({
         tg_id: msg.chat.id
     })
-    if(user.vip){
+    if(user&&user.vip){
         if(VipCheck(user.vipDate)){
             setTimeout(async () =>{
                 await data.updateOne({
@@ -291,7 +291,6 @@ bot.on('message', async (msg) => {
                 }, {
                     vip: false,
                     vipType: '',
-                    vipDate: ''
                 }, {
                     upsert: true
                 })
