@@ -15,6 +15,7 @@ app.use('/api/', require('./server/routes/routes'))
 app.listen(3000, ()=>{
   console.log('Сервер запущен')
 })
+
 // NTBA_FIX_319 = 1
 // db = mongodb+srv://Admin:ern-sy6-7Ny-t5a@cluster0.x5zhz.mongodb.net/database?retryWrites=true&w=majority
 // Bot = 2049069473:AAHir3pfuODtgD7thDmk9l9At-4bWDQb9Ag
@@ -24,3 +25,5 @@ app.listen(3000, ()=>{
 // Admin = @VinciCash_S
 // Chat = https://t.me/sniffer_chat
 // Channel = https://t.me/ssniffer
+
+

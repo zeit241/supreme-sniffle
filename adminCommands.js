@@ -258,7 +258,8 @@ bot.onText(/\/addpromo/, async (msg) => {
         tg_id: msg.from.id
     })
     if (user.isAdmin) {
-        if (msg.text.split(' ')[1] !== '' && msg.text.split(' ')[2] !== '' && msg.text.split(' ')[3] !== '') {
+        if (msg.text.split(' ')[1] && msg.text.split(' ')[2] && msg.text.split(' ')[3]) {
+            console.log(msg.text.split(' ')[1])
             let promo = await promocode.findOne({
                 promo: msg.text.split(' ')[1]
             })
