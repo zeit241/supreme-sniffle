@@ -72,7 +72,7 @@ const userSchema = new Schema({
     },
     ref_balance:{
         type: Number
-    }
+    },
 },{
     versionKey: false
 })
