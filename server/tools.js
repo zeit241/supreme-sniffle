@@ -23,7 +23,7 @@ module.exports = tools = {
         return Math.round((Date.parse(new Date()) - Date.parse(date))/86400000)
     },
     GetDateFormat(date){
-        return `${new Date(date).getDay().toString().length==1? '0'+new Date(date).getDay():new Date(date).getDay()}.${new Date(date).getMonth().toString().length==1? '0'+new Date(date).getMonth():new Date(date).getMonth()}.${new Date(date).getFullYear()} / ${new Date(date).getHours().toString().length==1? '0'+new Date(date).getHours():new Date(date).getHours()}:${new Date(date).getMinutes().toString().length==1? '0'+new Date(date).getMinutes():new Date(date).getMinutes()}`
+        return `${new Date(date).getDate().toString().length==1? '0'+new Date(date).getDate():new Date(date).getDate()}.${(new Date(date).getMonth()+1).toString().length==1? '0'+(new Date(date).getMonth()+1):(new Date(date).getMonth()+1)}.${new Date(date).getFullYear()} / ${(new Date(date).getHours()+3).toString().length==1? '0'+(new Date(date).getHours()+3):(new Date(date).getHours()+3)}:${new Date(date).getMinutes().toString().length==1? '0'+new Date(date).getMinutes():new Date(date).getMinutes()}`
     },
     VipCheck(date){
         return new Date(date) < new Date()

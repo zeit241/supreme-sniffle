@@ -40,6 +40,9 @@ const userSchema = new Schema({
         required: true,
         default: false
     },
+    ban_reason:{
+        type: String,
+    },
     vipDate:{
         type: String,
         required: false,
@@ -73,6 +76,13 @@ const userSchema = new Schema({
     ref_balance:{
         type: Number
     },
+    edit_mode:{
+        type: Boolean,
+        default: false
+    },
+    edit_modeType:{
+        type: String,
+    }
 },{
     versionKey: false
 })

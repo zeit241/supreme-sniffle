@@ -39,10 +39,8 @@ bot.onText(/\/givebalance/, async (msg) => {
                                     bot.sendMessage(user.ref_id, `💸 Ваш Реферальный баланс был обновлен (${x.ref_balance||0}₽ → ${Number(x.ref_balance||0) + ((Number(msg.text.split(' ')[2])*20)/100)}₽)`)
                                 })
                             }
-
                             bot.sendMessage(msg.chat.id, `💸 Баланс ${'@'+user.login||user.tg_id} успешно обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
                             bot.sendMessage(Number(msg.text.split(' ')[1]), `💸 Ваш баланс был обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
-                            
                         }
                     }).catch(err => {
                         console.error(err)
@@ -72,6 +70,7 @@ bot.onText(/\/unvip/, async (msg) => {
                     }, {
                         vip: false,
                         vipType: '',
+                        vipDate: new Date()
                     }, {
                         upsert: true
                     }).then((data) => {
@@ -216,7 +215,7 @@ bot.onText(/\/getuserinfo/, async (msg) => {
                     ref_id: Number(msg.text.split(' ')[1])
                 })
                 if (user) {
-                    bot.sendMessage(msg.chat.id, `👨🏻‍💻 Пользователь ${user.login}\n\n🆔 ID: ${user.tg_id}\n💰 Баланс: ${user.balance}\n👨‍👩‍👧‍👧 Рефералов: ${users.length||0}\n👨‍👩‍👧‍👧 Реферальный баланс: ${user.ref_balance||0}\n👨‍👩‍👧‍👧 Количество аккаунтов: ${accounts.length||0}\n\n👑 VIP: ${user.vip?'✅':'🚫'}\n⏳ VIP закончится через: ${user.vip?GetStringDate(new Date(user.vipDate)):'🚫'}\n\n📆 Дата регистрации: ${GetDateFormat(user.reg_date)}`)
+                    bot.sendMessage(msg.chat.id, `👨🏻‍💻 Пользователь ${user.login}\n\n🆔 ID: ${user.tg_id}\n💰 Баланс: ${user.balance}\n🗣 Приглашен: ${user.ref_id==0?'-':user.ref_id}\n👨‍👩‍👧‍👧 Рефералов: ${users.length||0}\n👨‍👩‍👧‍👧 Реферальный баланс: ${user.ref_balance||0}\n👨‍👩‍👧‍👧 Количество аккаунтов: ${accounts.length||0}\n\n👑 VIP: ${user.vip?'✅':'🚫'}\n⏳ VIP закончится через: ${user.vip?GetStringDate(new Date(user.vipDate)):'🚫'}\n\n📆 Дата регистрации: ${GetDateFormat(user.reg_date)}`)
                 } else {
                     bot.sendMessage(msg.chat.id, '❌ Пользователь с таким ID не найден')
                 }

