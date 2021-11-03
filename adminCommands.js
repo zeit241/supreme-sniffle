@@ -363,7 +363,7 @@ bot.onText(/\/addvippromo/, async (msg) => {
                 bot.sendMessage(msg.chat.id, '❌ Такой промокод уже существет.')
             }
         }else{
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/addpromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
+            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/addvippromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
         }
     }
 })
