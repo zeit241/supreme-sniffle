@@ -264,6 +264,7 @@ bot.onText(/\/addpromo/, async (msg) => {
             })
             if(!promo){
                 await new promocode({
+                    type: 'balance',
                     promo: msg.text.split(' ')[1],
                     value: msg.text.split(' ')[2],
                     mactivation: Number(msg.text.split(' ')[3])
@@ -330,6 +331,69 @@ bot.onText(/\/allpromoinfo/, async (msg) => {
         }else{
             bot.sendMessage(msg.chat.id, '❌ Промокодов нет')
         } 
+    }
+})
+
+bot.onText(/\/addvippromo/, async (msg) => {
+    const user = await data.findOne({
+        tg_id: msg.from.id
+    })
+    if (user.isAdmin) {
+        if (msg.text.split(' ')[1] && msg.text.split(' ')[2] && msg.text.split(' ')[3]) {
+            console.log(msg.text.split(' ')[1])
+            let promo = await promocode.findOne({
+                promo: msg.text.split(' ')[1]
+            })
+            if(!promo){
+                await new promocode({
+                    type: 'vip',
+                    promo: msg.text.split(' ')[1],
+                    value: msg.text.split(' ')[2],
+                    mactivation: Number(msg.text.split(' ')[3])
+                }).save().then((data) => {
+                    if (data) {
+                        bot.sendMessage(msg.chat.id, `✅ Промокод <code>${msg.text.split(' ')[1]}</code> успешно добавлен.`,{
+                            parse_mode: 'HTML'
+                        })
+                    }
+                }).catch(err => {
+                    bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                })
+            }else{
+                bot.sendMessage(msg.chat.id, '❌ Такой промокод уже существет.')
+            }
+        }else{
+            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/addpromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
+        }
+    }
+})
+bot.onText(/\/removepromo/, async (msg) => {
+    const user = await data.findOne({
+        tg_id: msg.from.id
+    })
+    if (user.isAdmin) {
+        if (msg.text.split(' ')[1]) {
+            let promo = await promocode.findOne({
+                promo: msg.text.split(' ')[1]
+            })
+            if(promo){
+                await promocode.deleteOne({
+                    promo: msg.text.split(' ')[1],
+                }).then((data) => {
+                    if (data) {
+                        bot.sendMessage(msg.chat.id, `✅ Промокод <code>${msg.text.split(' ')[1]}</code> успешно удален.`,{
+                            parse_mode: 'HTML'
+                        })
+                    }
+                }).catch(err => {
+                    bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                })
+            }else{
+                bot.sendMessage(msg.chat.id, '❌ Такой промокод уже существет.')
+            }
+        }else{
+            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/removepromo <PROMO> ')
+        }
     }
 })
 // /ban

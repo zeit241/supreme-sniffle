@@ -20,6 +20,9 @@ const userSchema = new Schema({
     },
     usedBy:{
         type: Array,
+    },
+    type: {
+        type: String,
     }
 }, {
     versionKey: false

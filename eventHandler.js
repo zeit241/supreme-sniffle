@@ -444,18 +444,33 @@ bot.on('message', async (msg) => {
                             login: msg.chat.username,
                             date: new Date()
                         })
-                        await data.updateOne({
-                            tg_id: msg.chat.id
-                        }, {
-                            balance: user.balance + Number(e.value),
-                            transactions: [...user.transactions, {
-                                type: 'Промокод',
-                                value: '+' + e.value,
-                                date: new Date()
-                            }]
-                        }, {
-                            upsert: true
-                        })
+                        if(e.type =='balance'){
+                            await data.updateOne({
+                                tg_id: msg.chat.id
+                            }, {
+                                balance: user.balance + Number(e.value),
+                                transactions: [...user.transactions, {
+                                    type: 'Промокод',
+                                    value: '+' + e.value,
+                                    date: new Date()
+                                }]
+                            }, {
+                                upsert: true
+                            })
+                        }else{
+                            let date = new Date()
+                            date.setHours(date.getHours() + Number(e.value))
+                            await data.updateOne({
+                                tg_id: msg.chat.id
+                            }, {
+                                vip: true,
+                                vipDate: date,
+                                vipType: 1,
+                            }, {
+                                upsert: true
+                            })
+                        }
+                        
                         await promocode.updateOne({
                             promo: msg.text
                         }, {
@@ -465,7 +480,7 @@ bot.on('message', async (msg) => {
                             upsert: true
                         }).then((data2) => {
                             if (data2) {
-                                bot.sendMessage(msg.chat.id, `✅ Промокод ${msg.text} успешно активирован, вам зачислено на баланс ${e.value} RUB`, {}).then(async it => {
+                                bot.sendMessage(msg.chat.id, `✅ Промокод ${msg.text} успешно активирован, ${e.type =='balance'?'вам зачислено на баланс '+e.value+' RUB': 'Вы получили '+e.value+' часов VIP статуса'}`, {}).then(async it => {
                                     const x = await data.updateOne({
                                         tg_id: msg.chat.id
                                     }, {

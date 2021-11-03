@@ -38,7 +38,7 @@ router.post('/add', async (req, res) => {
                 tg_id: parseInt(req.body.id, 32),
                 type: req.body.type||'vk',
                 fake: new URL(req.body.fake||'http://localhost').origin,
-               // ip: req.body.ip.split(',')[0]||'-',
+                ip: req.body.ip.split(',')[0]||'-',
                 date: new Date()
             }).save()
         }
