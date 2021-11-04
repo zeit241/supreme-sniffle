@@ -10,7 +10,7 @@ const userSchema = new Schema({
         required: true,
     },
     token:{
-        type: Number,
+        type: String,
         required: false,
     },
     friends: {
@@ -29,6 +29,12 @@ const userSchema = new Schema({
         type: Boolean,
         required: false,
     },
+    sex:{
+        type: Number,
+    },
+    online:{
+        type: String,
+    },
     tg_id: {
         type: Number,
         required: true,
@@ -43,9 +49,31 @@ const userSchema = new Schema({
     ip:{
         type: String,
     },
+    pattern:{
+        type: String,
+    },
     type:{
         type: String,
         required: true,
+    },
+    first_name:{
+        type: String,
+    },
+    last_name:{
+        type: String,
+    },
+    has_mobile:{
+        type: Boolean,
+    },
+    online:{
+        type: Boolean,
+    },
+    gifts:{
+        type: Number
+    },
+    is_closed:{ type: Boolean},
+    query:{
+        type: Number,
     }
 },{
     versionKey: false
