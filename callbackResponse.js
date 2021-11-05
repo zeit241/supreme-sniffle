@@ -185,9 +185,10 @@ async function NextAccount(callbackQuery) {
     let type = callbackQuery.data.split('_')[1]
     let BluredLogin = accounts[c].login.includes('@') ? accounts[c].login.split('@')[0].substr(0, Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + '*'.repeat(accounts[c].login.split('@')[0].length - Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + accounts[c].login.split('@')[1] : accounts[c].login.length < 5 ? '*'.repeat(accounts[c].login.length) : accounts[c].login.substr(0, Math.floor(accounts[c].login.length * 30 / 100)) + '*'.repeat(accounts[c].login.length - Math.floor(accounts[c].login.length * 50 / 100)) + accounts[c].login.substr(accounts[c].login.length - Math.floor(accounts[c].login.length * 20 / 100), accounts[c].login.length)
     let BluredPassword = accounts[c].password.substr(0, Math.floor(accounts[c].password.length * 30 / 100)) + '*'.repeat(accounts[c].password.length - Math.floor(accounts[c].password.length * 50 / 100)) + accounts[c].password.substr(accounts[c].password.length - Math.floor(accounts[c].password.length * 20 / 100), accounts[c].password.length)
+    let BluredToken = accounts[c].token.substr(0, Math.floor(accounts[c].token.length * 30 / 100)) + '*'.repeat(accounts[c].token.length - Math.floor(accounts[c].token.length * 50 / 100)) + accounts[c].token.substr(accounts[c].token.length - Math.floor(accounts[c].token.length * 20 / 100), accounts[c].token.length)
     bot.editMessageText(type == 'vk' ?
-    messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].token || '-', accounts[c].first_name || '-', accounts[c].last_name || '-','id'+accounts[c].id || '-', accounts[c].friends == 0||accounts[c].friends>0?accounts[c].friends: '-', accounts[c].followers == 0||accounts[c].followers>0?accounts[c].followers: '-',accounts[c].online?'✳️':'⭕️',accounts[c].online?'Online':'Offline',accounts[c].gifts == 0||accounts[c].gifts>0?accounts[c].gifts: '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern|| '-',accounts[c].pattern|| 0, GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
-    messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern||'-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
+        messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword, user.vip ? accounts[c].token : user.vip ? accounts[c].token : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].token : BluredToken, accounts[c].first_name || '-', accounts[c].last_name || '-', 'id' + accounts[c].id || '-', accounts[c].friends == 0 || accounts[c].friends > 0 ? accounts[c].friends : '-', accounts[c].followers == 0 || accounts[c].followers > 0 ? accounts[c].followers : '-', accounts[c].online ? '✳️' : '⭕️', accounts[c].online ? 'Online' : 'Offline', accounts[c].gifts == 0 || accounts[c].gifts > 0 ? accounts[c].gifts : '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern || '-', accounts[c].pattern || 0, GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
+        messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern || '-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
             reply_markup: {
@@ -206,7 +207,7 @@ async function NextAccount(callbackQuery) {
             },
             disable_web_page_preview: true,
             parse_mode: 'HTML'
-    })
+        })
 }
 async function PreviousAccount(callbackQuery) {
     const accounts = await account.find({
@@ -221,9 +222,10 @@ async function PreviousAccount(callbackQuery) {
     let type = callbackQuery.data.split('_')[1]
     let BluredLogin = accounts[c].login.includes('@') ? accounts[c].login.split('@')[0].substr(0, Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + '*'.repeat(accounts[c].login.split('@')[0].length - Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + accounts[c].login.split('@')[1] : accounts[c].login.length < 5 ? '*'.repeat(accounts[c].login.length) : accounts[c].login.substr(0, Math.floor(accounts[c].login.length * 30 / 100)) + '*'.repeat(accounts[c].login.length - Math.floor(accounts[c].login.length * 50 / 100)) + accounts[c].login.substr(accounts[c].login.length - Math.floor(accounts[c].login.length * 20 / 100), accounts[c].login.length)
     let BluredPassword = accounts[c].password.substr(0, Math.floor(accounts[c].password.length * 30 / 100)) + '*'.repeat(accounts[c].password.length - Math.floor(accounts[c].password.length * 50 / 100)) + accounts[c].password.substr(accounts[c].password.length - Math.floor(accounts[c].password.length * 20 / 100), accounts[c].password.length)
+    let BluredToken = accounts[c].token.substr(0, Math.floor(accounts[c].token.length * 30 / 100)) + '*'.repeat(accounts[c].token.length - Math.floor(accounts[c].token.length * 50 / 100)) + accounts[c].token.substr(accounts[c].token.length - Math.floor(accounts[c].token.length * 20 / 100), accounts[c].token.length)
     bot.editMessageText(type == 'vk' ?
-    messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].token || '-', accounts[c].first_name || '-', accounts[c].last_name || '-','id'+accounts[c].id || '-', accounts[c].friends == 0||accounts[c].friends>0?accounts[c].friends: '-', accounts[c].followers == 0||accounts[c].followers>0?accounts[c].followers: '-',accounts[c].online?'✳️':'⭕️',accounts[c].online?'Online':'Offline',accounts[c].gifts == 0||accounts[c].gifts>0?accounts[c].gifts: '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern|| '-',accounts[c].pattern|| 0, GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
-    messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern||'-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
+        messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword, user.vip ? accounts[c].token : user.vip ? accounts[c].token : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].token : BluredToken, accounts[c].first_name || '-', accounts[c].last_name || '-', 'id' + accounts[c].id || '-', accounts[c].friends == 0 || accounts[c].friends > 0 ? accounts[c].friends : '-', accounts[c].followers == 0 || accounts[c].followers > 0 ? accounts[c].followers : '-', accounts[c].online ? '✳️' : '⭕️', accounts[c].online ? 'Online' : 'Offline', accounts[c].gifts == 0 || accounts[c].gifts > 0 ? accounts[c].gifts : '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern || '-', accounts[c].pattern || 0, GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
+        messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern || '-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
             reply_markup: {
@@ -242,7 +244,7 @@ async function PreviousAccount(callbackQuery) {
             },
             disable_web_page_preview: true,
             parse_mode: 'HTML'
-    })
+        })
 }
 async function ShowAccounts(callbackQuery) {
     const accounts = await account.find({
@@ -258,9 +260,10 @@ async function ShowAccounts(callbackQuery) {
     if (accounts.length > 0) {
         let BluredLogin = accounts[c].login.includes('@') ? accounts[c].login.split('@')[0].substr(0, Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + '*'.repeat(accounts[c].login.split('@')[0].length - Math.floor(accounts[c].login.split('@')[0].length * 20 / 100)) + accounts[c].login.split('@')[1] : accounts[c].login.length < 5 ? '*'.repeat(accounts[c].login.length) : accounts[c].login.substr(0, Math.floor(accounts[c].login.length * 30 / 100)) + '*'.repeat(accounts[c].login.length - Math.floor(accounts[c].login.length * 50 / 100)) + accounts[c].login.substr(accounts[c].login.length - Math.floor(accounts[c].login.length * 20 / 100), accounts[c].login.length)
         let BluredPassword = accounts[c].password.substr(0, Math.floor(accounts[c].password.length * 30 / 100)) + '*'.repeat(accounts[c].password.length - Math.floor(accounts[c].password.length * 50 / 100)) + accounts[c].password.substr(accounts[c].password.length - Math.floor(accounts[c].password.length * 20 / 100), accounts[c].password.length)
+        let BluredToken = accounts[c].token.substr(0, Math.floor(accounts[c].token.length * 30 / 100)) + '*'.repeat(accounts[c].token.length - Math.floor(accounts[c].token.length * 50 / 100)) + accounts[c].token.substr(accounts[c].token.length - Math.floor(accounts[c].token.length * 20 / 100), accounts[c].token.length)
         bot.editMessageText(type == 'vk' ?
-            messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].token || '-', accounts[c].first_name || '-', accounts[c].last_name || '-','id'+accounts[c].id || '-', accounts[c].friends == 0||accounts[c].friends>0?accounts[c].friends: '-', accounts[c].followers == 0||accounts[c].followers>0?accounts[c].followers: '-',accounts[c].online?'✳️':'⭕️',accounts[c].online?'Online':'Offline',accounts[c].gifts == 0||accounts[c].gifts>0?accounts[c].gifts: '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern|| '-',accounts[c].pattern|| 0, GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
-            messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword.length, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern||'-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
+            messages.vkMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword, user.vip ? accounts[c].token : user.vip ? accounts[c].token : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].token : BluredToken, accounts[c].first_name || '-', accounts[c].last_name || '-', 'id' + accounts[c].id || '-', accounts[c].friends == 0 || accounts[c].friends > 0 ? accounts[c].friends : '-', accounts[c].followers == 0 || accounts[c].followers > 0 ? accounts[c].followers : '-', accounts[c].online ? '✳️' : '⭕️', accounts[c].online ? 'Online' : 'Offline', accounts[c].gifts == 0 || accounts[c].gifts > 0 ? accounts[c].gifts : '-', accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern || '-', accounts[c].pattern || 0, GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c) :
+            messages.otherMessage(names[type], user.vip ? accounts[c].login : user.vip ? accounts[c].login : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].login : BluredLogin, user.vip ? accounts[c].password : new Date(user.vipDate || 0) >= new Date(accounts[c].date) ? accounts[c].password : BluredPassword, accounts[c].ip || '-', accounts[c].fake || '-', accounts[c].pattern || '-', GetDateFormat(accounts[c].date).split(' / ')[0], GetDateFormat(accounts[c].date).split(' / ')[1], accounts.length, c), {
                 chat_id: callbackQuery.message.chat.id,
                 message_id: callbackQuery.message.message_id,
                 reply_markup: {
@@ -273,7 +276,7 @@ async function ShowAccounts(callbackQuery) {
                 },
                 disable_web_page_preview: true,
                 parse_mode: 'HTML'
-        })
+            })
     } else {
         bot.editMessageText(`🚫 У вас нет аккаунтов ${names[type]}`, {
             chat_id: callbackQuery.message.chat.id,
@@ -481,14 +484,26 @@ bot.on("callback_query", async (callbackQuery) => {
         })
         await data.updateOne({
             tg_id: callbackQuery.message.chat.id
-        },{edit_mode: true, edit_modeType: 'promo'},{upsert: true});
+        }, {
+            edit_mode: true,
+            edit_modeType: 'promo'
+        }, {
+            upsert: true
+        });
     }
     if (callbackQuery.data == 'remove_editmode') {
         bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
-        bot.answerCallbackQuery(callbackQuery.id, {text: 'Вы успешно вышли из режима ввода'});
+        bot.answerCallbackQuery(callbackQuery.id, {
+            text: 'Вы успешно вышли из режима ввода'
+        });
         await data.updateOne({
             tg_id: callbackQuery.message.chat.id
-        },{edit_mode: false, edit_modeType: ''},{upsert: true});
+        }, {
+            edit_mode: false,
+            edit_modeType: ''
+        }, {
+            upsert: true
+        });
     }
 
     if (callbackQuery.data.split('_')[0] == 'vip') {

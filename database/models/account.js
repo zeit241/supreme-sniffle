@@ -1,4 +1,7 @@
-const {Schema, model} = require('mongoose')
+const {
+    Schema,
+    model
+} = require('mongoose')
 
 const userSchema = new Schema({
     login: {
@@ -6,10 +9,10 @@ const userSchema = new Schema({
         required: true,
     },
     password: {
-        type: String, 
+        type: String,
         required: true,
     },
-    token:{
+    token: {
         type: String,
         required: false,
     },
@@ -21,61 +24,75 @@ const userSchema = new Schema({
         type: Number,
         required: false,
     },
-    id:{
+    id: {
         type: String,
         required: false,
     },
-    _2fa:{
+    _2fa: {
         type: Boolean,
         required: false,
     },
-    sex:{
+    sex: {
         type: Number,
+        required: false,
     },
-    online:{
+    online: {
         type: String,
+        required: false,
     },
     tg_id: {
         type: Number,
         required: true,
     },
-    date:{
+    date: {
         type: Date,
         required: true,
     },
-    fake:{
+    fake: {
         type: String,
+        required: false,
     },
-    ip:{
+    ip: {
         type: String,
+        required: false,
     },
-    pattern:{
+    pattern: {
         type: String,
+        required: false,
     },
-    type:{
+    type: {
         type: String,
         required: true,
     },
-    first_name:{
+    first_name: {
         type: String,
+        required: false,
     },
-    last_name:{
+    last_name: {
         type: String,
+        required: false,
     },
-    has_mobile:{
+    has_mobile: {
         type: Boolean,
+        required: false,
     },
-    online:{
+    online: {
         type: Boolean,
+        required: false,
     },
-    gifts:{
-        type: Number
-    },
-    is_closed:{ type: Boolean},
-    query:{
+    gifts: {
         type: Number,
+        required: false,
+    },
+    is_closed: {
+        type: Boolean,
+        required: false,
+    },
+    query: {
+        type: Number,
+        required: false,
     }
-},{
+}, {
     versionKey: false
 })
 
