@@ -136,51 +136,52 @@ bot.onText(/🔗 Мои ссылки/, async (msg) => {
         tg_id: msg.chat.id
     })
     if (user.isAccepted == 'true' && !user.edit_mode && !user.ban) {
-        if (user.vip) {
-            bot.sendMessage(msg.chat.id, `😻 Пожалуйста выберите категорию`, {
-                reply_markup: {
-                    inline_keyboard: [
-                        [{
-                            text: 'Вконтакте',
-                            callback_data: 'showLinks_vk'
-                        }, {
-                            text: 'Instagram',
-                            callback_data: 'showLinks_inst'
-                        }],
-                        [{
-                            text: 'Одноклассники',
-                            callback_data: 'showLinks_ok'
-                        }, {
-                            text: 'Facebook',
-                            callback_data: 'showLinks_fb'
-                        }],
-                        [{
-                            text: 'TikTok',
-                            callback_data: 'showLinks_tt'
-                        }, {
-                            text: 'Steam',
-                            callback_data: 'showLinks_st'
-                        }],
-                        [{
-                            text: '➡️',
-                            callback_data: 'nextLinksReplay_3'
-                        }]
-                    ]
-                }
-            })
-        } else {
-            bot.sendMessage(msg.chat.id, `У вас нет активного <b>VIP</b> статуса😔\nВы можете приобрести его пополнив баланс и нажав кнопку ниже⤵️`, {
-                reply_markup: {
-                    inline_keyboard: [
-                        [{
-                            text: 'Купить VIP',
-                            callback_data: 'show_vip'
-                        }]
-                    ]
-                },
-                parse_mode: 'HTML'
-            })
-        }
+        bot.sendMessage(msg.chat.id, `😻 Пожалуйста выберите категорию`, {
+            reply_markup: {
+                inline_keyboard: [
+                    [{
+                        text: 'Вконтакте',
+                        callback_data: 'showLinks_vk'
+                    }, {
+                        text: 'Instagram',
+                        callback_data: 'showLinks_inst'
+                    }],
+                    [{
+                        text: 'Одноклассники',
+                        callback_data: 'showLinks_ok'
+                    }, {
+                        text: 'Facebook',
+                        callback_data: 'showLinks_fb'
+                    }],
+                    [{
+                        text: 'TikTok',
+                        callback_data: 'showLinks_tt'
+                    }, {
+                        text: 'Steam',
+                        callback_data: 'showLinks_st'
+                    }],
+                    [{
+                        text: '➡️',
+                        callback_data: 'nextLinksReplay_3'
+                    }]
+                ]
+            }
+        })
+        // if (user.vip) {
+            
+        // } else {
+        //     bot.sendMessage(msg.chat.id, `У вас нет активного <b>VIP</b> статуса😔\nВы можете приобрести его пополнив баланс и нажав кнопку ниже⤵️`, {
+        //         reply_markup: {
+        //             inline_keyboard: [
+        //                 [{
+        //                     text: 'Купить VIP',
+        //                     callback_data: 'show_vip'
+        //                 }]
+        //             ]
+        //         },
+        //         parse_mode: 'HTML'
+        //     })
+        // }
     } else {
         user.edit_mode ? edit(user.edit_modeType) : ban(user.ban_reason)
     }
