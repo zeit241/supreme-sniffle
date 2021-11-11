@@ -133,7 +133,7 @@ bot.onText(/\/addnewlink/, async (msg) => {
                     e = e.substr(1, e.length - 2).split('|')
                     type = e[1]
                     querys[e[0]] = {
-                        name: e[2],
+                        name: e[2].split('_').join(' '),
                         description: e[3].split('_').join(' '),
                         image: e[4],
                         redirect: e[5]

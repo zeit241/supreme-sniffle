@@ -89,7 +89,7 @@ async function ShowLinkInfo(callbackQuery) {
     let c = 0
     bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
     bot.sendPhoto(callbackQuery.message.chat.id, links.query[c].image, {
-        caption: `😺 Шаблон #${c+1} [${links.query[c].name}]\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`,
+        caption: `😺 Шаблон #${c+1} ${links.query[c].name}\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`,
         reply_markup: {
             inline_keyboard: [
                 links.query[c + 1] ? [{
@@ -120,7 +120,7 @@ async function showPrevLink(callbackQuery) {
         message_id: callbackQuery.message.message_id,
         parse_mode: 'HTML'
     })
-    await bot.editMessageCaption(`😺 Шаблон #${c+1} [${links.query[c].name}]\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
+    await bot.editMessageCaption(`😺 Шаблон #${c+1} ${links.query[c].name}\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
         chat_id: callbackQuery.message.chat.id,
         message_id: callbackQuery.message.message_id,
         reply_markup: {
@@ -158,7 +158,7 @@ async function showNextLink(callbackQuery) {
         message_id: callbackQuery.message.message_id,
         parse_mode: 'HTML'
     })
-    await bot.editMessageCaption(`Шаблон #${c+1} [${links.query[c].name}]\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
+    await bot.editMessageCaption(`Шаблон #${c+1} ${links.query[c].name}\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
         chat_id: callbackQuery.message.chat.id,
         message_id: callbackQuery.message.message_id,
         reply_markup: {
