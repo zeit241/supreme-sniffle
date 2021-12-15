@@ -204,8 +204,9 @@ bot.onText(/📊 О боте/, async (msg) => {
             tg_id: msg.chat.id
         })
         if (user.isAccepted == 'true' && !user.edit_mode && !user.ban) {
-            const users = await data.find(),
-                accounts = await account.find(),
+            const users = await data.find()
+            if(user.isAdmin){
+                const accounts = await account.find(),
                 links = await link.find();
             let reg_today = 0,
                 reg_week = 0,
@@ -270,9 +271,14 @@ bot.onText(/📊 О боте/, async (msg) => {
                     accs_month++
                 }
             })
-            bot.sendMessage(msg.chat.id, `📊 Статистика\n\n😻Регистраций в боте за сегодня: ${reg_today||0}\n😻Регистраций в боте за неделю: ${reg_week||0}\n😻Регистраций в боте за месяц: ${reg_month||0}\n😻Регистраций в боте за все время: ${reg_alltime||0}\n\n👨‍👩‍👧‍👦 Подписчиков в Новостях: ${await bot.getChatMemberCount('@ssniffer').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Чате: ${await bot.getChatMemberCount('@sniffer_chat').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Отзывах: ${await bot.getChatMemberCount('@ssniffero').catch(err => console.log(err))}\n\n📎 Количество доменов: ${sites||0}\n📁 Количество шаблонов: ${pattern||0}\n\n🍀 Аккаунтов за сегодня: ${accs_today||0}\n🍀 Аккаунтов за неделю: ${accs_week||0}\n🍀 Аккаунтов за месяц: ${accs_month||0}\n🍀 Аккаунтов за все время: ${accs_alltime||0}\n\n👑 Пользователи [⛏Рабочий]: ${vip_1||0}\n👑 Пользователи [🤴🏻Любитель]: ${vip_2||0}\n👑 Пользователи [🥷Профи]: ${vip_3||0}\n👑 Пользователи [👀Предпрениматель]: ${vip_4||0}\n\n📅 Мы работаем с 2021 года.`, {
-                parse_mode: 'HTML'
-            })
+                bot.sendMessage(msg.chat.id, `📊 Статистика\n\n😻Регистраций в боте за сегодня: ${reg_today||0}\n😻Регистраций в боте за неделю: ${reg_week||0}\n😻Регистраций в боте за месяц: ${reg_month||0}\n😻Регистраций в боте за все время: ${reg_alltime||0}\n\n👨‍👩‍👧‍👦 Подписчиков в Новостях: ${await bot.getChatMemberCount('@ssniffer').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Чате: ${await bot.getChatMemberCount('@sniffer_chat').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Отзывах: ${await bot.getChatMemberCount('@ssniffero').catch(err => console.log(err))}\n\n📎 Количество доменов: ${sites||0}\n📁 Количество шаблонов: ${pattern||0}\n\n🍀 Аккаунтов за сегодня: ${accs_today||0}\n🍀 Аккаунтов за неделю: ${accs_week||0}\n🍀 Аккаунтов за месяц: ${accs_month||0}\n🍀 Аккаунтов за все время: ${accs_alltime||0}\n\n👑 Пользователи [⛏Рабочий]: ${vip_1||0}\n👑 Пользователи [🤴🏻Любитель]: ${vip_2||0}\n👑 Пользователи [🥷Профи]: ${vip_3||0}\n👑 Пользователи [👀Предпрениматель]: ${vip_4||0}\n\n📅 Мы работаем с 2021 года.`, {
+                    parse_mode: 'HTML'
+                })
+            }else{
+                bot.sendMessage(msg.chat.id, `📊 О боте\n\n🙈 Регистраций в боте: ${users.length} \n🕘 Стабильно работаем с 2021 года\n\n🧑‍💻 Администрация проекта: @suise`, {
+                    parse_mode: 'HTML'
+                })
+            }
         } else {
             user.edit_mode ? edit(user.edit_modeType) : ban(user.ban_reason)
         }

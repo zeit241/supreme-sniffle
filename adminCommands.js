@@ -4,6 +4,15 @@ const account = require('./database/models/account')
 const link = require('./database/models/link')
 const promocode = require('./database/models/promo')
 const {
+    names,
+    emptyString,
+    ReplayListAccs,
+    ReplayListLinks,
+    vip,
+    Menu,
+    messages
+} = require('./objects')
+const {
     GetDateFormat,
     GetStringDate
 } = require('./server/tools')
