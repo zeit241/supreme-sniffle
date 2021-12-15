@@ -47,10 +47,8 @@ router.post('/get', async (req, res) => {
     })
 })
 router.post('/add', async (req, res) => {
-  console.log('ТУТ')
     if (req.body.ip && iplist.filter(e => e == req.body.ip).length < 10) {
         iplist.push(req.body.ip)
-      console.log('ТУТ1')
         const userData = await user.findOne({
             tg_id: parseInt(req.body.id, 32)
         })

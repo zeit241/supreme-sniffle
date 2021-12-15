@@ -41,6 +41,9 @@ bot.onText(/\/givebalance/, async (msg) => {
                             }
                             bot.sendMessage(msg.chat.id, `💸 Баланс ${'@'+user.login||user.tg_id} успешно обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
                             bot.sendMessage(Number(msg.text.split(' ')[1]), `💸 Ваш баланс был обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
+                            bot.sendMessage('-1001189677405', `💸 Пользователь <code>${callbackQuery.message.chat.id}</code> пополнил баланс на ${vip[c].price}!`,{
+                                parse_mode: 'HTML'
+                            })
                         }
                     }).catch(err => {
                         console.error(err)
