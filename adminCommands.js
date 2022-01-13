@@ -50,7 +50,7 @@ bot.onText(/\/givebalance/, async (msg) => {
                             }
                             bot.sendMessage(msg.chat.id, `💸 Баланс ${'@'+user.login||user.tg_id} успешно обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
                             bot.sendMessage(Number(msg.text.split(' ')[1]), `💸 Ваш баланс был обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
-                            bot.sendMessage('-1001189677405', `💸 Пользователь <code>${msg.text.split(' ')[1]}</code> пополнил баланс на ${msg.text.split(' ')[2]}!`,{
+                            bot.sendMessage(process.env.chatID, `💸 Пользователь <code>${msg.text.split(' ')[1]}</code> пополнил баланс на ${msg.text.split(' ')[2]}!`,{
                                 parse_mode: 'HTML'
                             })
                         }
