@@ -1,4 +1,5 @@
 const bot = require('./createBot')
+const qiwiApi = require('./qiwiApi')
 const {
     GetStringDate,
     CreateReplayList,
@@ -8,6 +9,7 @@ const data = require('./database/models/userData')
 const promocode = require('./database/models/promo')
 const account = require('./database/models/account')
 const link = require('./database/models/link')
+
 const {
     names,
     emptyString,
@@ -17,6 +19,7 @@ const {
     Menu,
     messages
 } = require('./objects')
+const { from } = require('form-data')
 async function СreateTransactionList(callbackQuery) {
     const user = await data.findOne({
         tg_id: callbackQuery.message.chat.id,
@@ -307,6 +310,113 @@ async function ShowAccounts(callbackQuery) {
 
 bot.on("callback_query", async (callbackQuery) => {
     const msg = callbackQuery.message;
+    if(callbackQuery.data.split('_')[0]=='checkPay'){
+        
+        await qiwiApi.getBillInfo(callbackQuery.data.split('_')[1])
+        .then(async bill=>{
+            console.log(bill)
+            if(bill.status.value == 'WAITING'){
+                bot.editMessageText('😔 Оплата не найдена\n⛔️ Если это ошибка, сообщите @vincicash_s', {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id,
+                    reply_markup: callbackQuery.message.reply_markup
+                })
+            } 
+            if(bill.status.value == 'PAID'){
+                bot.editMessageText('Успешная оплата✅', {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id
+                })
+                await data.findOne({
+                    tg_id: callbackQuery.from.id
+                }).then(async (user) => {
+                    if (user) {
+                        let transactions = user.transactions
+                        transactions.push({type: 'Пополнение', value: '+'+Number(bill.amount.value), date: new Date()})
+                        await data.updateOne({
+                            tg_id: callbackQuery.from.id
+                        }, {
+                            balance: Number(user.balance) + Number(bill.amount.value),
+                            transactions: transactions
+                        }, {
+                            upsert: true
+                        }).then(async(e) => {
+                            if (e) {
+                                if(user.ref_id && user.ref_id!=0){
+                                    let x = await data.findOne({tg_id: user.ref_id})
+                                    await data.updateOne({
+                                        tg_id: user.ref_id
+                                    },{ref_balance: Number(x.ref_balance||0) + ((Number(bill.amount.value)*20)/100), transactions: [...x.transactions, {type: 'Реф. система', value: '+'+((Number(bill.amount.value)*20)/100), date: new Date()}]}).then(e=>{
+                                        bot.sendMessage(user.ref_id, `💸 Ваш Реферальный баланс был обновлен (${x.ref_balance||0}₽ → ${Number(x.ref_balance||0) + ((Number(bill.amount.value)*20)/100)}₽)`)
+                                    })
+                                }
+                                //bot.sendMessage(msg.chat.id, `💸 Баланс ${'@'+user.login||user.tg_id} успешно обновлен (${user.balance}₽ → ${user.balance+Number(e.amount.value)}₽)`)
+                                bot.sendMessage(callbackQuery.from.id, `💸 Ваш баланс был обновлен (${user.balance}₽ → ${user.balance+Number(bill.amount.value)}₽)`)
+                                bot.sendMessage('-1001189677405', `💸 Пользователь <code>#${callbackQuery.from.id}</code> пополнил\nсвой баланс на ${bill.amount.value}₽ 🥳`,{
+                                    parse_mode: 'HTML'
+                                })
+                            }
+                        }).catch(err => {
+                            console.error(err)
+                            bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
+                        });
+                    }
+                })
+            }
+            
+            if(bill.status.value == 'REJECTED'){
+                bot.editMessageText('😔 Платеж отменен\n⛔️ Если это ошибка, сообщите @vincicash_s', {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id
+                })
+            }
+            if(bill.status.value == 'EXPIRED'){
+                bot.editMessageText('😔 Время истекло\n⛔️ Если это ошибка, сообщите @vincicash_s', {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id
+                })
+            }
+        })
+        .catch(err=>{console.error(err.message)})
+    }
+    if(callbackQuery.data=='ShowPayMenu'){
+        bot.editMessageText(`💸 Пожалуйста введите сумму пополнения.`, {
+            chat_id: callbackQuery.message.chat.id,
+            message_id: callbackQuery.message.message_id
+        })
+        await data.updateOne({
+            tg_id: callbackQuery.message.chat.id
+        }, {
+            edit_mode: true,
+            edit_modeType: 'balance'
+        }, {
+            upsert: true
+        });
+    }
+    if(callbackQuery.data=='showUpToMenu'){
+        bot.deleteMessage(callbackQuery.message.chat.id, callbackQuery.message.message_id)
+        const user = await data.findOne({
+            tg_id: msg.chat.id
+        })
+            bot.sendMessage(msg.chat.id, `💸 Пополнение баланса\n\nВаш актуальный баланс: ${user.balance} RUB\n\nМинимальная сумма пополнения — 100 рублей\n\n💚 Пополнение через QIWI\n💜 Пополнение через ЮMoney\n🧡 Пополнение через WebMoney\n\nНе нашли для себя удобного способа оплаты? Напишите нашему представителю по контактам ниже и мы что-нибудь придумаем для Вас\nПредставитель: @vincicash_s\n\nКакой  VIP статус лучше взять?\nhttps://teletype.in/@ssniffer/howbuy\n\nА так же если у вас есть сомнения по нашему боту можете посмотреть отзывы по кнопке ниже⤵️`, {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{
+                            text: '💰Пополнить Баланс',
+                            callback_data: 'ShowPayMenu'
+                        }],
+                        [{
+                            text: '🗂 История транзакций',
+                            callback_data: 'transactions'
+                        }, {
+                            text: '🍀 Отзывы',
+                            url: 'https://t.me/ssniffero'
+                        }]
+                    ]
+                },
+                disable_web_page_preview: true
+            })
+    }
     if (callbackQuery.data.split('_')[0] == 'experiance') {
         bot.deleteMessage(msg.chat.id, msg.message_id)
         if (callbackQuery.data.split('_')[1] == 'true') {
@@ -371,15 +481,15 @@ bot.on("callback_query", async (callbackQuery) => {
                 upsert: true
             })
         }
-        bot.sendMessage(msg.chat.id, 'Спасибо за ответы, перед тем как пользоваться сервисом обязательно прочитайте правила 📜', {
+        bot.sendMessage(msg.chat.id, 'Спасибо за ответы, перед тем как пользоваться сервисом обязательно прочитайте Пользовательское Соглашение 📜', {
             reply_markup: {
                 inline_keyboard: [
                     [{
-                        text: "📄 Правила",
+                        text: "📄 Пользовательское Соглашение",
                         url: "https://t.me/joinchat/zeCs0fv3Ux5kNDEy"
                     }],
                     [{
-                        text: "✅ Я прочитал",
+                        text: "✅ Я соглашаюсь с Пользовательским Соглашением",
                         callback_data: "rules_true"
                     }]
                 ]
@@ -561,13 +671,18 @@ bot.on("callback_query", async (callbackQuery) => {
                     chat_id: callbackQuery.message.chat.id,
                     message_id: callbackQuery.message.message_id
                 })
-                bot.sendMessage('-1001189677405', `👑 Пользователь <code>${callbackQuery.message.chat.id}</code> приобрел VIP статус ${vip[c].name}!`,{
+                bot.sendMessage('-1001189677405', `👑 Пользователь <code>#${callbackQuery.message.chat.id}</code> приобрел\nVIP статус ${vip[c].name}!`,{
                     parse_mode: 'html'
                 })
             } else {
-                bot.editMessageText('😔 У вас недостсточно средств на балансе, для пополения обратитесь к ' + process.env.Admin, {
+                bot.editMessageText('Для пополнения баланса нажмите на кнопку ниже', {
                     chat_id: callbackQuery.message.chat.id,
-                    message_id: callbackQuery.message.message_id
+                    message_id: callbackQuery.message.message_id,
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{text: 'Пополнить баланс', callback_data: 'showUpToMenu'}]
+                        ]
+                    }
                 })
             }
         }

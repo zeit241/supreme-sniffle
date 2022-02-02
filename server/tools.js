@@ -4,6 +4,10 @@ module.exports = tools = {
         let array = []
         return array
     },
+    ISODATE(oSignDate) {
+        "use strict";
+        return oSignDate.getFullYear().toString() + (1 + oSignDate.getMonth()).toString() + oSignDate.getDate().toString() + "T" + oSignDate.getHours().toString() + oSignDate.getMinutes().toString() + oSignDate.getSeconds().toString() + (oSignDate.getTimezoneOffset() > 0 ? "-" : "+") + ("0000" + (-1 * oSignDate.getTimezoneOffset() / 60) * 100).toString().substr(-4, 4);
+      },
     GetStringDate(date){
        let result = (date - new Date())+1000
        let seconds = Math.floor((result/1000)%60);

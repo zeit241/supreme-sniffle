@@ -50,20 +50,20 @@ bot.onText(/\/givebalance/, async (msg) => {
                             }
                             bot.sendMessage(msg.chat.id, `💸 Баланс ${'@'+user.login||user.tg_id} успешно обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
                             bot.sendMessage(Number(msg.text.split(' ')[1]), `💸 Ваш баланс был обновлен (${user.balance}₽ → ${user.balance+Number(msg.text.split(' ')[2])}₽)`)
-                            bot.sendMessage(process.env.chatID, `💸 Пользователь <code>${msg.text.split(' ')[1]}</code> пополнил баланс на ${msg.text.split(' ')[2]}!`,{
+                            bot.sendMessage('-1001189677405', `💸 Пользователь <code>#${msg.text.split(' ')[1]}</code> пополнил\nсвой баланс на ${msg.text.split(' ')[2]}₽ 🥳`,{
                                 parse_mode: 'HTML'
                             })
                         }
                     }).catch(err => {
                         console.error(err)
-                        bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                        bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                     });
                 } else {
                     bot.sendMessage(msg.chat.id, '✅ Пользователь с таким ID не найден')
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/givebalnce <ID> <СУММА>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/givebalance <ID> <СУММА>')
         }
     }
 })
@@ -91,14 +91,14 @@ bot.onText(/\/unvip/, async (msg) => {
                             bot.sendMessage(msg.chat.id, `✅ С пользователя ${'@'+user.login||user.tg_id} успешно снят VIP статус.`)
                         }
                     }).catch(err => {
-                        bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                        bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                     });
                 } else {
-                    bot.sendMessage(msg.chat.id, '❌ Пользователь с таким ID не найден')
+                    bot.sendMessage(msg.chat.id, '⛔️ Пользователь с таким ID не найден')
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id,  '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/givebalnce <ID> <СУММА>')
+            bot.sendMessage(msg.chat.id,  '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/givebalnce <ID> <СУММА>')
         }
     }
 })
@@ -119,14 +119,14 @@ bot.onText(/\/clear/, async (msg) => {
                             bot.sendMessage(msg.chat.id, `✅ Пользователь ${'@'+user.login||user.tg_id} успешно удален.`)
                         }
                     }).catch(err => {
-                        bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                        bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                     });
                 } else {
-                    bot.sendMessage(msg.chat.id, '❌ Пользователь с таким ID не найден')
+                    bot.sendMessage(msg.chat.id, '⛔️ Пользователь с таким ID не найден')
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/clear <ID>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/clear <ID>')
         }
     }
 })
@@ -160,7 +160,7 @@ bot.onText(/\/addnewlink/, async (msg) => {
                 })
             })
         } else {
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/clear <ID>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/clear <ID>')
         }
     }
 })
@@ -189,7 +189,7 @@ bot.onText(/\/removelink/, async (msg) => {
                                 bot.sendMessage(msg.chat.id, `✅ Шаблон #${msg.text.split(' ')[2]} успешно удален`)
                             }
                         }).catch(err => {
-                            bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                            bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                         });
                     } else {
                         await link.deleteOne({
@@ -199,15 +199,15 @@ bot.onText(/\/removelink/, async (msg) => {
                                 bot.sendMessage(msg.chat.id, `✅ Ссылка ${msg.text.split(' ')[1]} успешно удалена`)
                             }
                         }).catch(err => {
-                            bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                            bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                         });
                     }
                 } else {
-                    bot.sendMessage(msg.chat.id, '❌ Такой ссылки не найдено')
+                    bot.sendMessage(msg.chat.id, '⛔️ Такой ссылки не найдено')
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/removelink <LINK>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/removelink <LINK>')
         }
     }
 })
@@ -229,11 +229,11 @@ bot.onText(/\/getuserinfo/, async (msg) => {
                 if (user) {
                     bot.sendMessage(msg.chat.id, `👨🏻‍💻 Пользователь ${user.login}\n\n🆔 ID: ${user.tg_id}\n💰 Баланс: ${user.balance}\n🗣 Приглашен: ${user.ref_id==0?'-':user.ref_id}\n👨‍👩‍👧‍👧 Рефералов: ${users.length||0}\n👨‍👩‍👧‍👧 Реферальный баланс: ${user.ref_balance||0}\n👨‍👩‍👧‍👧 Количество аккаунтов: ${accounts.length||0}\n\n👑 VIP: ${user.vip?'✅':'🚫'}\n⏳ VIP закончится через: ${user.vip?GetStringDate(new Date(user.vipDate)):'🚫'}\n\n📆 Дата регистрации: ${GetDateFormat(user.reg_date)}`)
                 } else {
-                    bot.sendMessage(msg.chat.id, '❌ Пользователь с таким ID не найден')
+                    bot.sendMessage(msg.chat.id, '⛔️ Пользователь с таким ID не найден')
                 }
             })
         } else {
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/getuserinfo <ID>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/getuserinfo <ID>')
         }
     }
 })
@@ -287,13 +287,13 @@ bot.onText(/\/addpromo/, async (msg) => {
                         })
                     }
                 }).catch(err => {
-                    bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                    bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                 })
             }else{
-                bot.sendMessage(msg.chat.id, '❌ Такой промокод уже существет.')
+                bot.sendMessage(msg.chat.id, '⛔️ Такой промокод уже существет.')
             }
         }else{
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/addpromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/addpromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
         }
     }
 })
@@ -310,19 +310,19 @@ bot.onText(/\/promoinfo/, async (msg) => {
                 let used = ''
                 if(promo.activations>0){
                     promo.usedBy.map((e,i)=>{
-                        used += `#${i+1}\nИспользовал: @${e.login}\nID: <code>${e.tg_id}</code>\nДата: <code>${GetDateFormat(e.date)}</code>\n\n`
+                        used += `#${i+1}\n✅ Использовал: @${e.login}\nID: <code>${e.tg_id}</code>\nДата: <code>${GetDateFormat(e.date)}</code>\n\n`
                     })
                 }else{
-                    used = 'Промокод еще никто не использовал.'
+                    used = '🔖 Промо-код еще никто не использовал.'
                 }
-                bot.sendMessage(msg.chat.id, `🎟 Промокод <code>${promo.promo}</code>\n\nИспользовано: ${promo.activations}/${promo.mactivation}\n\n${used}`,{
+                bot.sendMessage(msg.chat.id, `🎟 Промо-код <code>${promo.promo}</code>\n\nИспользовано: ${promo.activations}/${promo.mactivation}\n\n${used}`,{
                     parse_mode: 'HTML'
                 })
             }else{
-                bot.sendMessage(msg.chat.id, '❌ Такой промокод не существет.')
+                bot.sendMessage(msg.chat.id, '⛔️ Такой промо-код не существет.')
             }
         }else{
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/promoinfo <PROMO>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/promoinfo <PROMO>')
         } 
     }
 })
@@ -333,15 +333,15 @@ bot.onText(/\/allpromoinfo/, async (msg) => {
     if (user.isAdmin) {
         let promo = await promocode.find()
         if(promo.length>0){
-            let str = 'Промокоды\n\n'
+            let str = 'Промо-коды\n\n'
             promo.map((e,i)=>{
-                str+=`Промокод #${i+1} <code>${e.promo}</code> Использовано: ${e.activations}/${e.mactivation}\n`
+                str+=`Промо-код #${i+1} <code>${e.promo}</code> Использовано: ${e.activations}/${e.mactivation}\n`
             })
             bot.sendMessage(msg.chat.id, str,{
                 parse_mode: 'HTML'
             })
         }else{
-            bot.sendMessage(msg.chat.id, '❌ Промокодов нет')
+            bot.sendMessage(msg.chat.id, '⛔️ Промо-кодов нет')
         } 
     }
 })
@@ -364,18 +364,18 @@ bot.onText(/\/addvippromo/, async (msg) => {
                     mactivation: Number(msg.text.split(' ')[3])
                 }).save().then((data) => {
                     if (data) {
-                        bot.sendMessage(msg.chat.id, `✅ Промокод <code>${msg.text.split(' ')[1]}</code> успешно добавлен.`,{
+                        bot.sendMessage(msg.chat.id, `✅ Промо-код <code>${msg.text.split(' ')[1]}</code> успешно добавлен.`,{
                             parse_mode: 'HTML'
                         })
                     }
                 }).catch(err => {
-                    bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                    bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                 })
             }else{
-                bot.sendMessage(msg.chat.id, '❌ Такой промокод уже существет.')
+                bot.sendMessage(msg.chat.id, '⛔️ Такой промокод уже существет.')
             }
         }else{
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/addvippromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/addvippromo <PROMO> <VALUE> <MAX ACTIVATIONS>')
         }
     }
 })
@@ -398,13 +398,13 @@ bot.onText(/\/removepromo/, async (msg) => {
                         })
                     }
                 }).catch(err => {
-                    bot.sendMessage(msg.chat.id, '❌ Что-то пошло не так 😥, попробуйте позже')
+                    bot.sendMessage(msg.chat.id, '⛔️ Что-то пошло не так 😥, попробуйте позже')
                 })
             }else{
-                bot.sendMessage(msg.chat.id, '❌ Такой промокод уже существет.')
+                bot.sendMessage(msg.chat.id, '⛔️ Такой промокод уже существет.')
             }
         }else{
-            bot.sendMessage(msg.chat.id, '❌ Неверный синтаксис, пожалуйста введите команду в виде\n/removepromo <PROMO> ')
+            bot.sendMessage(msg.chat.id, '⛔️ Неверный синтаксис, пожалуйста введите команду в виде\n/removepromo <PROMO> ')
         }
     }
 })
